@@ -1,0 +1,18 @@
+#
+
+tty -s && mesg n || true
+
+export DATABASE_HOST=mysql.default.svc.cluster.local
+
+# kubeoff
+
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+alias kubeitup="cd ~/bootstrap-workstation && sudo mavenlink-kubeadm && bash utilities/full-stack-reset.sh"
+alias kctx=kubectx
+alias kns=kubens
+alias k=kubectl
+alias mavenlink="cd ~/workspace/mavenlink"
+alias devops="cd ~/workspace/devops && devops"
+alias charts="cd ~/workspace/charts"
+alias bsw="cd ~/bootstrap-workstation"

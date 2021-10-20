@@ -1,0 +1,11 @@
+[user]
+	email = jsenechal@mavenlink.com
+	name = Jack Senechal
+[alias]
+	st = status
+	br = branch
+	co = checkout
+	ci = commit
+	cw = whatchanged
+[hub]
+	host = mavenlink.com

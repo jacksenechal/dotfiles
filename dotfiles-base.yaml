@@ -2,6 +2,18 @@
 - name: dotfiles
   hosts: all
   tasks:
+    - name: install github cli keyring
+      # copied from instructions at https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian-ubuntu-linux-raspberry-pi-os-apt
+      ansible.builtin.copy:
+        src: files/githubcli-archive-keyring.gpg
+        dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
+        mode: '0644'
+        owner: root
+        group: root
+    - name: add github cli repo
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main
+        state: present
     - name: install the good stuff
       become: yes
       ansible.builtin.apt:
@@ -11,6 +23,7 @@
         - rsync
         - git
         - silversearcher-ag
+        - gh
     - name: make VIM dirs
       ansible.builtin.file:
         path: "{{ item }}"
@@ -23,10 +36,14 @@
         - ~/.tmp/fzf-history
         - ~/.local/bin
         - ~/.local/go
+        - ~/.vim/autoload
     - name: copy config files into place
       ansible.posix.synchronize:
-        # src: "{{ item }}"
-        src: files/
+        src: files/home/
         dest: ~/
         recursive: yes
         perms: yes
+    - name: setup vim-plug
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        dest: ~/.vim/autoload/plug.vim

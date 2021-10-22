@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/jack/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -106,10 +106,10 @@ PROMPT=$PROMPT'$(kube_ps1) '
 export KUBECONFIG=~/.kube/config:~/.kube/kubeadm_config:~/.kube/multipass_config:~/.kube/k3s_config
 export AWS_OKTA_BACKEND=secret-service
 source <(kubectl completion zsh)
-source ~/bootstrap-workstation/ansible/templates/dot-chart-s3-env
-source ~/bootstrap-workstation/ansible/templates/dot-kube-ps1
+source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env
+source ~/workspace/bootstrap-workstation/ansible/templates/dot-kube-ps1
 export GOPATH="$HOME/.local/go"
-path=("$HOME/.local/bin" "$GOPATH/bin" $path)
+path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" $path)
 export PATH
 
 source ~/.bash_aliases_jack

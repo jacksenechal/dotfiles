@@ -3,3 +3,6 @@
 
 [local:vars]
 ansible_connection=local
+
+[vagrant-workstation]
+vagrant-workstation

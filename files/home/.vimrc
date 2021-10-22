@@ -19,7 +19,7 @@ set undodir=~/.tmp/undo/
 set hlsearch
 set mouse=a
 let g:fzf_history_dir='~/.tmp/fzf-history'
-colo candycode
+" colo candycode
 highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE
 nnoremap <silent> <C-p> :Files<cr>

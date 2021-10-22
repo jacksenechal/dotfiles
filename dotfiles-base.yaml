@@ -3,6 +3,7 @@
   hosts: all
   tasks:
     - name: install github cli keyring
+      become: yes
       # copied from instructions at https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian-ubuntu-linux-raspberry-pi-os-apt
       ansible.builtin.copy:
         src: files/githubcli-archive-keyring.gpg
@@ -24,6 +25,16 @@
         - git
         - silversearcher-ag
         - gh
+        - tree
+        - zsh
+    - name: fetch ohmyzsh
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: /tmp/ohmyzsh-install.sh
+    - name: install ohmyzsh
+      ansible.builtin.shell: sh /tmp/ohmyzsh-install.sh --unattended
+      args:
+        creates: ~/.oh-my-zsh
     - name: make VIM dirs
       ansible.builtin.file:
         path: "{{ item }}"
@@ -43,6 +54,8 @@
         dest: ~/
         recursive: yes
         perms: yes
+        # rsync_opts:
+        #   - '--ignore-existing'
     - name: setup vim-plug
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim

@@ -106,7 +106,7 @@ PROMPT=$PROMPT'$(kube_ps1) '
 export KUBECONFIG=~/.kube/config:~/.kube/kubeadm_config:~/.kube/multipass_config:~/.kube/k3s_config
 export AWS_OKTA_BACKEND=secret-service
 source <(kubectl completion zsh)
-source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env
+# source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env
 source ~/workspace/bootstrap-workstation/ansible/templates/dot-kube-ps1
 export GOPATH="$HOME/.local/go"
 path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" $path)

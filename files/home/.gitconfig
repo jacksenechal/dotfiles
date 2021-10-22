@@ -9,3 +9,7 @@
 	cw = whatchanged
 [hub]
 	host = mavenlink.com
+[core]
+  editor = vim
+[diff]
+  tool = vimdiff

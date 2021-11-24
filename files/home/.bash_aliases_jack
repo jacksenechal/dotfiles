@@ -18,4 +18,4 @@ alias devops="cd ~/workspace/devops && devops"
 alias charts="cd ~/workspace/charts"
 alias bsw="cd ~/bootstrap-workstation"
 alias workstation-ssh='ssh -A multipass@$(multipass info workstation | grep IPv4 | cut -d: -f2 | xargs)'
-alias dirty='ls -1d ~/workspace/*/ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
+alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'

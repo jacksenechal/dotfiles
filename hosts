@@ -4,5 +4,11 @@
 [local:vars]
 ansible_connection=local
 
-[vagrant-workstation]
-vagrant-workstation
+[multipass]
+10.178.98.250
+
+[multipass:vars]
+ansible_user=multipass
+
+# [vagrant-workstation]
+# vagrant-workstation

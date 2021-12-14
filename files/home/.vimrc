@@ -6,6 +6,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
+Plug 'christoomey/vim-tmux-navigator'
 call plug#end()
 syntax on
 filetype plugin indent on
@@ -18,6 +19,8 @@ set undofile
 set undodir=~/.tmp/undo/
 set hlsearch
 set mouse=a
+set laststatus=2
+set statusline+=%F
 let g:fzf_history_dir='~/.tmp/fzf-history'
 " colo candycode
 highlight Normal ctermbg=NONE

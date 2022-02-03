@@ -7,6 +7,9 @@ Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'hashivim/vim-terraform'
+Plug 'hashivim/vim-packer'
+Plug 'hashivim/vim-vaultproject'
 call plug#end()
 syntax on
 filetype plugin indent on

@@ -28,6 +28,7 @@
         - gh
         - tree
         - zsh
+        - keychain
     - name: fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh

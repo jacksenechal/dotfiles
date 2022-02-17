@@ -90,6 +90,7 @@ PROMPT=$PROMPT'$(kube_ps1) '
 # else
 #   export EDITOR='mvim'
 # fi
+export EDITOR='vim'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -111,6 +112,8 @@ source ~/workspace/bootstrap-workstation/ansible/templates/dot-kube-ps1
 export GOPATH="$HOME/.local/go"
 path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" $path)
 export PATH
+
+eval $(keychain -q --eval id_rsa)
 
 source ~/.bash_aliases_jack
 

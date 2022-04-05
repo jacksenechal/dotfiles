@@ -1,6 +1,7 @@
 call plug#begin('~/.vim/plugged')
 Plug 'vim-scripts/candycode.vim'
 Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
 Plug 'alvan/vim-closetag'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
@@ -25,7 +26,7 @@ set mouse=a
 set laststatus=2
 set statusline+=%F
 let g:fzf_history_dir='~/.tmp/fzf-history'
-" colo candycode
+" colo slate
 highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE
 nnoremap <silent> <C-p> :Files<cr>

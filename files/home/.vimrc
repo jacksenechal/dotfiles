@@ -1,5 +1,7 @@
 call plug#begin('~/.vim/plugged')
 Plug 'vim-scripts/candycode.vim'
+Plug 'endel/vim-github-colorscheme'
+Plug 'NLKNguyen/papercolor-theme'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'alvan/vim-closetag'
@@ -25,8 +27,11 @@ set hlsearch
 set mouse=a
 set laststatus=2
 set statusline+=%F
+set foldmethod=syntax
+set nofoldenable
 let g:fzf_history_dir='~/.tmp/fzf-history'
-" colo slate
+set background=dark
+colo PaperColor
 highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE
 nnoremap <silent> <C-p> :Files<cr>

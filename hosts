@@ -4,18 +4,25 @@
 [local:vars]
 ansible_connection=local
 
-[multipass]
-10.178.98.115
+[virtualbox]
+127.0.0.1
 
-[multipass:vars]
-ansible_user=multipass
-
-[p52]
-192.168.0.221
-
-[p52:vars]
+[virtualbox:vars]
 ansible_user=jack
-ansible_port=22999
+ansible_port=2222
 
+# [multipass]
+# 10.178.98.115
+# 
+# [multipass:vars]
+# ansible_user=multipass
+# 
+# [p52]
+# 192.168.0.221
+# 
+# [p52:vars]
+# ansible_user=jack
+# ansible_port=22999
+# 
 # [vagrant-workstation]
 # vagrant-workstation

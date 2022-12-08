@@ -31,6 +31,7 @@ set statusline+=%F
 set foldmethod=syntax
 set nofoldenable
 let g:fzf_history_dir='~/.tmp/fzf-history'
+let g:terraform_fmt_on_save=1
 set background=dark
 colo PaperColor
 highlight Normal ctermbg=NONE

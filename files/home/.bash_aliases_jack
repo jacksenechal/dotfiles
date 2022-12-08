@@ -2,17 +2,20 @@
 
 tty -s && mesg n || true
 
-export DATABASE_HOST=mysql.default.svc.cluster.local
+export DATABASE_HOST=127.0.0.1
+export DATABASE_USERNAME=bigmaven
+export PUMA_SSL_BIND=true
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 
 # kubeoff
 
+alias k=kubectl
+alias g=git
 alias pbcopy='xclip -selection clipboard'
 alias pbpaste='xclip -selection clipboard -o'
 alias kubeitup="cd ~/bootstrap-workstation && sudo mavenlink-kubeadm && bash utilities/full-stack-reset.sh"
 alias kctx="kubectl ctx"
 alias kns="kubectl ns"
-alias k=kubectl
 alias mavenlink="cd ~/workspace/mavenlink"
 alias devops="cd ~/workspace/devops && devops"
 alias charts="cd ~/workspace/charts"

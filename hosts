@@ -8,7 +8,7 @@ ansible_connection=local
 vbws # this relies on an entry in /etc/hosts pointed to 127.0.0.1, since virtualbox is NATed to port 2222 there
 
 [virtualbox:vars]
-ansible_user=jack
+ansible_user=dev
 ansible_port=2222
 
 # [multipass]

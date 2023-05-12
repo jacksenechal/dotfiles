@@ -25,6 +25,7 @@
         - rsync
         - git
         - silversearcher-ag
+        - ripgrep
         - gh
         - tree
         - zsh

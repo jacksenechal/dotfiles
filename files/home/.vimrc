@@ -14,6 +14,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'hashivim/vim-terraform'
 Plug 'hashivim/vim-packer'
 Plug 'hashivim/vim-vaultproject'
+Plug 'ludovicchabant/vim-gutentags'
 call plug#end()
 syntax on
 filetype plugin indent on

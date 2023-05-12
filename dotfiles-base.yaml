@@ -30,6 +30,7 @@
         - tree
         - zsh
         - keychain
+        - universal-ctags
     - name: fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
@@ -63,3 +64,5 @@
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         dest: ~/.vim/autoload/plug.vim
+    - name: install vim plugins
+      ansible.builtin.shell: vim +PlugInstall +qall

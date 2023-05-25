@@ -110,7 +110,7 @@ source <(kubectl completion zsh)
 # source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env
 source ~/workspace/bootstrap-workstation/ansible/templates/dot-kube-ps1
 export GOPATH="$HOME/.local/go"
-path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" $path)
+path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" "/opt/mssql-tools/bin/" $path)
 export PATH
 
 eval $(keychain -q --eval id_rsa)

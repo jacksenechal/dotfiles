@@ -15,6 +15,10 @@ Plug 'hashivim/vim-terraform'
 Plug 'hashivim/vim-packer'
 Plug 'hashivim/vim-vaultproject'
 Plug 'ludovicchabant/vim-gutentags'
+" Plug 'pearofducks/ansible-vim'
+" Plug 'godlygeek/tabular'
+" Plug 'plasticboy/vim-markdown'
+" Plug 'reedes/vim-pencil'
 call plug#end()
 syntax on
 filetype plugin indent on
@@ -31,6 +35,7 @@ set laststatus=2
 set statusline+=%F
 set foldmethod=syntax
 set nofoldenable
+let g:vim_markdown_folding_disabled=1
 let g:fzf_history_dir='~/.tmp/fzf-history'
 let g:terraform_fmt_on_save=1
 set background=dark

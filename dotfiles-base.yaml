@@ -2,20 +2,17 @@
 - name: dotfiles
   hosts: all
   tasks:
-    - name: install github cli keyring
-      become: yes
-      # copied from instructions at https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian-ubuntu-linux-raspberry-pi-os-apt
-      ansible.builtin.copy:
-        src: files/githubcli-archive-keyring.gpg
-        dest: /usr/share/keyrings/githubcli-archive-keyring.gpg
-        mode: '0644'
-        owner: root
-        group: root
-    - name: add github cli repo
-      become: yes
-      ansible.builtin.apt_repository:
-        repo: deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main
-        state: present
+    - name: Download GitHub CLI keyring
+      become: true
+      shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
+      changed_when: false
+    - name: Create GitHub CLI repository configuration
+      become: true
+      lineinfile:
+        path: /etc/apt/sources.list.d/github-cli.list
+        line: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+        create: yes
+      notify: update apt cache
     - name: install the good stuff
       become: yes
       ansible.builtin.apt:
@@ -26,11 +23,14 @@
         - git
         - silversearcher-ag
         - ripgrep
-        - gh
         - tree
         - zsh
         - keychain
         - universal-ctags
+        - nodejs
+        - curl
+        - gh
+      notify: update apt cache
     - name: fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
@@ -66,3 +66,9 @@
         dest: ~/.vim/autoload/plug.vim
     - name: install vim plugins
       ansible.builtin.shell: vim +PlugInstall +qall
+
+  handlers:
+    - name: update apt cache
+      become: true
+      ansible.builtin.apt:
+        update_cache: yes

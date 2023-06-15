@@ -13,6 +13,7 @@
         line: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
         create: yes
       notify: update apt cache
+
     - name: install the good stuff
       become: yes
       ansible.builtin.apt:
@@ -31,6 +32,7 @@
         - curl
         - gh
       notify: update apt cache
+
     - name: fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
@@ -39,6 +41,16 @@
       ansible.builtin.shell: sh /tmp/ohmyzsh-install.sh --unattended
       args:
         creates: ~/.oh-my-zsh
+
+    - name: copy config files into place
+      ansible.posix.synchronize:
+        src: files/home/
+        dest: ~/
+        recursive: yes
+        perms: yes
+        # rsync_opts:
+        #   - '--ignore-existing'
+
     - name: make VIM dirs
       ansible.builtin.file:
         path: "{{ item }}"
@@ -52,14 +64,6 @@
         - ~/.local/bin
         - ~/.local/go
         - ~/.vim/autoload
-    - name: copy config files into place
-      ansible.posix.synchronize:
-        src: files/home/
-        dest: ~/
-        recursive: yes
-        perms: yes
-        # rsync_opts:
-        #   - '--ignore-existing'
     - name: setup vim-plug
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim

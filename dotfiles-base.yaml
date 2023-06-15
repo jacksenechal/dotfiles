@@ -71,6 +71,20 @@
     - name: install vim plugins
       ansible.builtin.shell: vim +PlugInstall +qall
 
+    - name: Create temporary awscli directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: awscli
+      register: awscli_dir
+    - name: Unzip AWS CLI
+      ansible.builtin.unarchive:
+        src: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: "{{ awscli_dir.path }}"
+        remote_src: yes
+    - name: Install AWS CLI
+      become: true
+      ansible.builtin.command: "sudo {{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
+
   handlers:
     - name: update apt cache
       become: true

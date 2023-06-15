@@ -100,6 +100,8 @@
           dest: start/vim-surround
         - repo: https://github.com/alvan/vim-closetag
           dest: start/vim-closetag
+        - repo: https://github.com/junegunn/fzf
+          dest: start/fzf
         - repo: https://github.com/junegunn/fzf.vim
           dest: start/fzf.vim
         - repo: https://github.com/tpope/vim-fugitive

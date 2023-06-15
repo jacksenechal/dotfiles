@@ -19,3 +19,14 @@ ssh-add ~/.ssh/id_rsa
 ## Regular maintenance
 
 - Periodically update your VIM plugins with `:PlugUpdate`
+
+## Kubernetes setup, etc
+
+- Setup AWS SSO:
+  https://www.notion.so/kantata-dev/aws-sso-e0b629d0c86944dd9e5126b403434db3?pvs=4
+- Install krew:
+  https://krew.sigs.k8s.io/docs/user-guide/setup/install/
+- Install kctx and kns:
+
+        kubectl krew install ctx
+        kubectl krew install ns

@@ -104,7 +104,7 @@ export EDITOR='vim'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export KUBECONFIG=~/.kube/config:~/.kube/kubeadm_config:~/.kube/multipass_config:~/.kube/k3s_config
+export KUBECONFIG=~/.kube/config
 export AWS_OKTA_BACKEND=secret-service
 source <(kubectl completion zsh)
 # source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env

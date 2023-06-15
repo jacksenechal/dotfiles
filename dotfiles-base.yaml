@@ -2,47 +2,48 @@
 - name: dotfiles
   hosts: all
   tasks:
-    - name: Download GitHub CLI keyring
-      become: true
-      shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
-      changed_when: false
-    - name: Create GitHub CLI repository configuration
-      become: true
-      lineinfile:
-        path: /etc/apt/sources.list.d/github-cli.list
-        line: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-        create: yes
-      notify: update apt cache
+    - block: # Update apt cache only once for the block, not for each task
+      - name: Download GitHub CLI keyring
+        become: true
+        shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
+        changed_when: false
+      - name: Create GitHub CLI repository configuration
+        become: true
+        lineinfile:
+          path: /etc/apt/sources.list.d/github-cli.list
+          line: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+          create: yes
+        notify: Update apt cache
 
-    - name: install the good stuff
-      become: yes
-      ansible.builtin.apt:
-        pkg:
-        - vim
-        - tmux
-        - rsync
-        - git
-        - silversearcher-ag
-        - ripgrep
-        - tree
-        - zsh
-        - keychain
-        - universal-ctags
-        - nodejs
-        - curl
-        - gh
-      notify: update apt cache
+      - name: Install the required packages
+        become: yes
+        ansible.builtin.apt:
+          pkg:
+          - neovim
+          - tmux
+          - rsync
+          - git
+          - silversearcher-ag
+          - ripgrep
+          - tree
+          - zsh
+          - keychain
+          - universal-ctags
+          - nodejs
+          - curl
+          - gh
+        notify: Update apt cache
 
-    - name: fetch ohmyzsh
+    - name: Fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
         dest: /tmp/ohmyzsh-install.sh
-    - name: install ohmyzsh
+    - name: Install ohmyzsh
       ansible.builtin.shell: sh /tmp/ohmyzsh-install.sh --unattended
       args:
         creates: ~/.oh-my-zsh
 
-    - name: copy config files into place
+    - name: Copy config files into place
       ansible.posix.synchronize:
         src: files/home/
         dest: ~/
@@ -51,7 +52,19 @@
         # rsync_opts:
         #   - '--ignore-existing'
 
-    - name: make VIM dirs
+    - name: Clone fzf
+      ansible.builtin.git:
+        repo: https://github.com/junegunn/fzf.git
+        dest: ~/.fzf
+        clone: yes
+        force: no
+        depth: 1
+    - name: Install fzf
+      ansible.builtin.shell: ~/.fzf/install --all --no-update-rc --no-bash --no-fish
+      args:
+        creates: ~/.fzf/bin/fzf
+
+    - name: Make VIM dirs
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -63,13 +76,61 @@
         - ~/.tmp/fzf-history
         - ~/.local/bin
         - ~/.local/go
-        - ~/.vim/autoload
-    - name: setup vim-plug
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        dest: ~/.vim/autoload/plug.vim
-    - name: install vim plugins
-      ansible.builtin.shell: vim +PlugInstall +qall
+        - ~/.local/share/nvim/site/pack/all/start
+        - ~/.local/share/nvim/site/pack/all/opt
+    - name: Clone VIM plugins
+      ansible.builtin.git:
+        repo: "{{ item.repo }}"
+        dest: "~/.local/share/nvim/site/pack/all/{{ item.dest }}"
+        clone: yes
+        force: no
+        depth: 1
+      loop:
+        - repo: https://github.com/scrooloose/nerdtree
+          dest: start/nerdtree
+        - repo: https://github.com/vim-scripts/candycode.vim
+          dest: start/candycode
+        - repo: https://github.com/endel/vim-github-colorscheme
+          dest: start/github-colorscheme
+        - repo: https://github.com/NLKNguyen/papercolor-theme
+          dest: start/papercolor-theme
+        - repo: https://github.com/tpope/vim-commentary
+          dest: start/vim-commentary
+        - repo: https://github.com/tpope/vim-surround
+          dest: start/vim-surround
+        - repo: https://github.com/alvan/vim-closetag
+          dest: start/vim-closetag
+        - repo: https://github.com/junegunn/fzf.vim
+          dest: start/fzf.vim
+        - repo: https://github.com/tpope/vim-fugitive
+          dest: start/vim-fugitive
+        - repo: https://github.com/tpope/vim-rhubarb
+          dest: start/vim-rhubarb
+        - repo: https://github.com/christoomey/vim-tmux-navigator
+          dest: start/vim-tmux-navigator
+        - repo: https://github.com/hashivim/vim-terraform
+          dest: start/vim-terraform
+        - repo: https://github.com/ludovicchabant/vim-gutentags
+          dest: start/vim-gutentags
+        - repo: https://github.com/plasticboy/vim-markdown
+          dest: start/vim-markdown
+        - repo: https://github.com/github/copilot.vim
+          dest: start/copilot.vim
+        # - repo: https://github.com/nvim-treesitter/nvim-treesitter
+        #   dest: start/nvim-treesitter
+        # note: opt plugins are not loaded automatically
+        # note: if you move something here, delete it manually from start/
+        #       ... and vice versa
+        - repo: https://github.com/hashivim/vim-packer
+          dest: opt/vim-packer
+        - repo: https://github.com/hashivim/vim-vaultproject
+          dest: opt/vim-vaultproject
+        - repo: https://github.com/pearofducks/ansible-vim
+          dest: opt/ansible-vim
+        - repo: https://github.com/godlygeek/tabular
+          dest: opt/tabular
+        - repo: https://github.com/reedes/vim-pencil
+          dest: opt/vim-pencil
 
     - name: Create temporary awscli directory
       ansible.builtin.tempfile:
@@ -86,7 +147,7 @@
       ansible.builtin.command: "sudo {{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
 
   handlers:
-    - name: update apt cache
+    - name: Update apt cache
       become: true
       ansible.builtin.apt:
         update_cache: yes

@@ -34,6 +34,15 @@
           - gh
         notify: Update apt cache
 
+    - name: Copy config files into place
+      ansible.posix.synchronize:
+        src: files/home/
+        dest: ~/
+        recursive: yes
+        perms: yes
+        # rsync_opts:
+        #   - '--ignore-existing'
+
     - name: Fetch ohmyzsh
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
@@ -43,14 +52,17 @@
       args:
         creates: ~/.oh-my-zsh
 
-    - name: Copy config files into place
-      ansible.posix.synchronize:
-        src: files/home/
-        dest: ~/
-        recursive: yes
-        perms: yes
-        # rsync_opts:
-        #   - '--ignore-existing'
+
+    - name: Replace line in /etc/pam.d/chsh
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/pam.d/chsh
+        regexp: '^auth\s+required\s+pam_shells.so$'
+        line: 'auth       sufficient   pam_shells.so'
+        backup: yes
+    - name: Change default shell to zsh
+      become: true
+      ansible.builtin.command: chsh -s "$(which zsh)" {{ ansible_user }}
 
     - name: Clone fzf
       ansible.builtin.git:
@@ -147,6 +159,33 @@
     - name: Install AWS CLI
       become: true
       ansible.builtin.command: "sudo {{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
+
+    - name: Set up kubectl
+      become: true
+      ansible.builtin.get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/v1.26.4/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Create temporary krew directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: krew
+      register: krew_dir
+    - name: Download krew
+      ansible.builtin.unarchive:
+        src: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz"
+        dest: "{{ krew_dir.path }}"
+        remote_src: yes
+    - name: Install krew for kubectl
+      become: true
+      ansible.builtin.command: "{{ krew_dir.path }}/krew-linux_amd64 install krew"
+
+    - name: Set up kctx and kns
+      become: true
+      ansible.builtin.command: "kubectl krew install ctx ns"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
 
   handlers:
     - name: Update apt cache

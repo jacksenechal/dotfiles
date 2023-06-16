@@ -167,25 +167,33 @@
         dest: /usr/local/bin/kubectl
         mode: '0755'
 
-    - name: Create temporary krew directory
-      ansible.builtin.tempfile:
-        state: directory
-        suffix: krew
-      register: krew_dir
-    - name: Download krew
-      ansible.builtin.unarchive:
-        src: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz"
-        dest: "{{ krew_dir.path }}"
-        remote_src: yes
-    - name: Install krew for kubectl
-      become: true
-      ansible.builtin.command: "{{ krew_dir.path }}/krew-linux_amd64 install krew"
-
-    - name: Set up kctx and kns
-      become: true
-      ansible.builtin.command: "kubectl krew install ctx ns"
+    - name: Check if kctx exists
+      ansible.builtin.command: "kubectl ctx"
       environment:
         PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
+      register: kctx_result
+      ignore_errors: true
+    - block:
+      - name: Create temporary krew directory
+        ansible.builtin.tempfile:
+          state: directory
+          suffix: krew
+        register: krew_dir
+      - name: Download krew
+        ansible.builtin.unarchive:
+          src: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz"
+          dest: "{{ krew_dir.path }}"
+          remote_src: yes
+      - name: Install krew for kubectl
+        become: true
+        ansible.builtin.command: "{{ krew_dir.path }}/krew-linux_amd64 install krew"
+      - name: Set up kctx and kns
+        become: true
+        ansible.builtin.command: "kubectl krew install ctx ns"
+        environment:
+          PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
+      when: kctx_result.rc != 0
+
 
   handlers:
     - name: Update apt cache

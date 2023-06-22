@@ -62,7 +62,7 @@
         backup: yes
     - name: Change default shell to zsh
       become: true
-      ansible.builtin.command: chsh -s "$(which zsh)" {{ ansible_user }}
+      ansible.builtin.command: chsh -s "/usr/bin/zsh" {{ ansible_user }}
 
     - name: Clone fzf
       ansible.builtin.git:

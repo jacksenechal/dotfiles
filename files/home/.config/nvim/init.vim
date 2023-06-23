@@ -53,7 +53,18 @@ endfunction
 
 " Commands
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
-command! -nargs=* -bang AgH call fzf#vim#ag(<q-args>, fzf#vim#with_preview() . '--hidden', <bang>0)
+
+" Make Ag search everything
+" Default options are --nogroup --column --color
+let s:ag_options = '--hidden --skip-vcs-ignores --smart-case '
+command! -bang -nargs=* Ag
+      \ call fzf#vim#ag(
+      \   <q-args>,
+      \   s:ag_options,
+      \  <bang>0 ? fzf#vim#with_preview('up:60%')
+      \        : fzf#vim#with_preview('right:50%:hidden', '?'),
+      \   <bang>0
+      \ )
 
 " Copilot settings
 let g:copilot_filetypes = {

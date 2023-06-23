@@ -194,6 +194,27 @@
           PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
       when: kctx_result.rc != 0
 
+    - name: Set up Zsh Codex (https://github.com/tom-doerr/zsh_codex)
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/tom-doerr/zsh_codex/master/zsh_codex.plugin.zsh
+        dest: ~/.local/share/zsh/site-functions/zsh_codex.plugin.zsh
+        mode: '0644'
+    - name: Install openai CLI
+      ansible.builtin.command: "pip3 install openai"
+      become: true
+    - name: Configure openai CLI
+      # put this into a file called ~/.config/openaiapirc
+      # ---
+      # [openai]
+      # organization_id = ...
+      # secret_key = ...
+      ansible.builtin.copy:
+        dest: ~/.config/openaiapirc
+        content: |
+          [openai]
+          organization_id = ...
+          secret_key = ...
+
 
   handlers:
     - name: Update apt cache

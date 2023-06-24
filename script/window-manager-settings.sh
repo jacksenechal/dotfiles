@@ -11,7 +11,7 @@ gsettings set org.gnome.desktop.wm.keybindings maximize-horizontally "['${MODIFI
 gsettings set org.gnome.desktop.wm.keybindings maximize-vertically "['${MODIFIER}v']"
 gsettings set org.gnome.desktop.wm.keybindings toggle-maximized "['${MODIFIER}m']"
 gsettings set org.gnome.desktop.wm.keybindings begin-move "['${MODIFIER}Return']"
-gsettings set org.gnome.desktop.wm.keybindings begin-resize "['<Super>Return']"
+gsettings set org.gnome.desktop.wm.keybindings begin-resize "['${MODIFIER}<Shift>Return']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-corner-nw "['${MODIFIER}1']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-corner-ne "['${MODIFIER}2']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-corner-sw "['${MODIFIER}3']"
@@ -20,8 +20,6 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-side-n "['${MODIFIER}Up']
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-s "['${MODIFIER}Down']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-e "['${MODIFIER}Right']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-w "['${MODIFIER}Left']"
-
-
 
 # ## Harlan's tiling keybindings
 
@@ -38,7 +36,9 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-side-w "['${MODIFIER}Left
 # Ctrl+Alt+Super++        Grow window
 # Ctrl+Alt+Super+-        Shrink window
 
-# Rectangle for Mac
 
-# Look at gTile for Gnome: https://github.com/gTile/gTile
-# Also gnome-shell-extensions-negesti: https://github.com/negesti/gnome-shell-extensions-negesti
+# ---------------------------------------------------------------------------
+
+# Other settings
+gsettings set org.gnome.shell.app-switcher current-workspace-only true
+gsettings set org.gnome.shell.window-switcher current-workspace-only true

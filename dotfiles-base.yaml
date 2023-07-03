@@ -147,6 +147,12 @@
           dest: opt/tabular
         - repo: https://github.com/reedes/vim-pencil
           dest: opt/vim-pencil
+        - repo: https://github.com/sindrets/diffview.nvim
+          dest: opt/diffview.nvim
+        # - repo: https://github.com/TheJefe/vim-prreview
+        #   dest: opt/vim-prreview
+        # - repo: https://github.com/pwntester/octo.nvim
+        #   dest: opt/octo.nvim
 
     - name: Create temporary awscli directory
       ansible.builtin.tempfile:

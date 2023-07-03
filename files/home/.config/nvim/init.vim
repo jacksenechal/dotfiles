@@ -63,6 +63,18 @@ endfunction
 " Commands
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
+command! -nargs=0 GHdiff call GHDiffCommand()
+
+function! GHDiffCommand()
+    let temp_file = tempname()
+    let gh_diff_cmd = 'gh pr diff > ' . temp_file
+    execute '!'.gh_diff_cmd
+    tabnew
+    execute 'edit ' . temp_file
+    setlocal filetype=diff
+    setlocal readonly
+endfunction
+
 " Make Ag search everything
 " Default options are --nogroup --column --color
 let s:ag_options = '--hidden --skip-vcs-ignores --smart-case '

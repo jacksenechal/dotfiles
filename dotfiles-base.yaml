@@ -130,6 +130,8 @@
           dest: start/vim-markdown
         - repo: https://github.com/github/copilot.vim
           dest: start/copilot.vim
+        - repo: https://github.com/yasuhiroki/github-actions-yaml.vim
+          dest: start/github-actions-yaml.vim
         # - repo: https://github.com/nvim-treesitter/nvim-treesitter
         #   dest: start/nvim-treesitter
         # note: opt plugins are not loaded automatically

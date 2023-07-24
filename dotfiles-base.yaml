@@ -168,6 +168,13 @@
       become: true
       ansible.builtin.command: "sudo {{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
 
+    - name: Download and unzip terraform
+      ansible.builtin.unarchive:
+        src: "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip"
+        dest: /usr/local/bin
+        remote_src: yes
+        creates: /usr/local/bin/terraform
+
     - name: Set up kubectl
       become: true
       ansible.builtin.get_url:

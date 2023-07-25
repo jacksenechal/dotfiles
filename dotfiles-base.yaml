@@ -5,7 +5,7 @@
     - block: # Update apt cache only once for the block, not for each task
       - name: Download GitHub CLI keyring
         become: true
-        shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
+        shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
         changed_when: false
       - name: Create GitHub CLI repository configuration
         become: true
@@ -166,9 +166,10 @@
         remote_src: yes
     - name: Install AWS CLI
       become: true
-      ansible.builtin.command: "sudo {{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
+      ansible.builtin.command: "{{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
 
     - name: Download and unzip terraform
+      become: true
       ansible.builtin.unarchive:
         src: "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip"
         dest: /usr/local/bin

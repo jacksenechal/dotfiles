@@ -128,10 +128,12 @@
           dest: start/vim-gutentags
         - repo: https://github.com/plasticboy/vim-markdown
           dest: start/vim-markdown
-        - repo: https://github.com/github/copilot.vim
-          dest: start/copilot.vim
         - repo: https://github.com/yasuhiroki/github-actions-yaml.vim
           dest: start/github-actions-yaml.vim
+        - repo: https://github.com/github/copilot.vim
+          dest: start/copilot.vim
+        - repo: https://github.com/Exafunction/codeium.vim
+          dest: start/codeium.vim
         # - repo: https://github.com/nvim-treesitter/nvim-treesitter
         #   dest: start/nvim-treesitter
         # note: opt plugins are not loaded automatically
@@ -209,7 +211,6 @@
         environment:
           PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
       when: kctx_result.rc != 0
-
 
   handlers:
     - name: Update apt cache

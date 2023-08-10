@@ -87,6 +87,9 @@ command! -bang -nargs=* Ag
       \   <bang>0
       \ )
 
+" Codeium settings
+set statusline+=\{…\}%3{codeium#GetStatusString()}
+
 " Copilot settings
 let g:copilot_enabled = v:false
 

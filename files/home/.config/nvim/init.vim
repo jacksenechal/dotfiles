@@ -90,6 +90,12 @@ command! -bang -nargs=* Ag
 " Codeium settings
 set statusline+=\{…\}%3{codeium#GetStatusString()}
 
+let g:codeium_filetypes = {
+  \ 'gitcommit': v:true,
+  \ 'markdown': v:true,
+  \ 'yaml': v:true
+  \ }
+
 " Copilot settings
 let g:copilot_enabled = v:false
 
@@ -106,5 +112,6 @@ augroup LargeFile
         \ let f=getfsize(expand("<afile>"))
         \ | if f > 100000 || f == -2
         \ | let b:copilot_enabled = v:false
+        \ | let b:codeium_enabled = v:false
         \ | endif
 augroup END

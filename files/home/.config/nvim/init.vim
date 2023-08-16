@@ -39,7 +39,7 @@ set hlsearch
 set incsearch
 set mouse=a
 set laststatus=2
-set statusline+=%F
+set statusline=%F
 set foldmethod=syntax
 set nofoldenable
 
@@ -47,8 +47,6 @@ set nofoldenable
 let g:vim_markdown_folding_disabled = 1
 let g:terraform_fmt_on_save = 1
 let g:fzf_history_dir = '~/.tmp/fzf-history'
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_lint_on_insert_leave = 0
 
 " Key mappings
 nnoremap <silent> <C-p> :Files<CR>
@@ -90,7 +88,7 @@ command! -bang -nargs=* Ag
       \ )
 
 " Codeium settings
-set statusline+=\{…\}%3{codeium#GetStatusString()}
+set statusline+=\|\{…\}%3{codeium#GetStatusString()}
 
 let g:codeium_filetypes = {
   \ 'gitcommit': v:true,
@@ -106,6 +104,32 @@ let g:copilot_filetypes = {
   \ 'markdown': v:true,
   \ 'yaml': v:true
   \ }
+
+" ALE settings
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
+let g:ale_use_neovim_diagnostics_api = 1
+nmap <silent> [a <Plug>(ale_previous_wrap)
+nmap <silent> ]a <Plug>(ale_next_wrap)
+nmap <silent> [w <Plug>(ale_previous_wrap_warning)
+nmap <silent> ]w <Plug>(ale_next_wrap_warning)
+nmap <silent> [e <Plug>(ale_previous_wrap_error)
+nmap <silent> ]e <Plug>(ale_next_wrap_error)
+
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+
+    return l:counts.total == 0 ? 'OK' : printf(
+    \   '%dW %dE',
+    \   all_non_errors,
+    \   all_errors
+    \)
+endfunction
+
+set statusline+=\|Lint:%{LinterStatus()}
 
 " Autocommands
 augroup LargeFile

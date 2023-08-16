@@ -47,6 +47,8 @@ set nofoldenable
 let g:vim_markdown_folding_disabled = 1
 let g:terraform_fmt_on_save = 1
 let g:fzf_history_dir = '~/.tmp/fzf-history'
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
 
 " Key mappings
 nnoremap <silent> <C-p> :Files<CR>

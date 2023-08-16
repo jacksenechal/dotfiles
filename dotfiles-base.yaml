@@ -32,6 +32,8 @@
           - nodejs
           - curl
           - gh
+          - jq
+          - yamllint
         notify: Update apt cache
 
     - name: Copy config files into place
@@ -134,6 +136,8 @@
           dest: start/copilot.vim
         - repo: https://github.com/Exafunction/codeium.vim
           dest: start/codeium.vim
+        - repo: https://github.com/dense-analysis/ale.git
+          dest: start/ale
         # - repo: https://github.com/nvim-treesitter/nvim-treesitter
         #   dest: start/nvim-treesitter
         # note: opt plugins are not loaded automatically

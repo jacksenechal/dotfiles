@@ -51,7 +51,7 @@ let g:fzf_history_dir = '~/.tmp/fzf-history'
 " Key mappings
 nnoremap <silent> <C-p> :Files<CR>
 
-" Functions
+" Custom Functions
 function! RipgrepFzf(query, fullscreen)
   let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case -- %s || true'
   let initial_command = printf(command_fmt, shellescape(a:query))
@@ -59,11 +59,6 @@ function! RipgrepFzf(query, fullscreen)
   let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
   call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
 endfunction
-
-" Commands
-command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
-
-command! -nargs=0 GHdiff call GHDiffCommand()
 
 function! GHDiffCommand()
     let temp_file = tempname()
@@ -74,6 +69,10 @@ function! GHDiffCommand()
     setlocal filetype=diff
     setlocal readonly
 endfunction
+
+" Commands
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+command! -nargs=0 GHdiff call GHDiffCommand()
 
 " Make Ag search everything
 " Default options are --nogroup --column --color
@@ -91,7 +90,7 @@ command! -bang -nargs=* Ag
 set statusline+=\|\{…\}%3{codeium#GetStatusString()}
 
 let g:codeium_filetypes = {
-  \ 'gitcommit': v:true,
+  \ 'gitcommit': v:false,
   \ 'markdown': v:true,
   \ 'yaml': v:true
   \ }
@@ -130,6 +129,21 @@ function! LinterStatus() abort
 endfunction
 
 set statusline+=\|Lint:%{LinterStatus()}
+
+" vim-ai settings
+let g:vim_ai_chat = {
+\  "options": {
+\    "model": "gpt-4",
+\    "temperature": 0.2,
+\  },
+\}
+nnoremap <leader>a :AI<CR> " complete text on the current line or in visual selection
+xnoremap <leader>a :AI<CR>
+xnoremap <leader>c :AIChat<CR> " trigger chat
+nnoremap <leader>c :AIChat<CR>
+xnoremap <leader>n :AINewChat<CR> " trigger new chat
+nnoremap <leader>n :AINewChat<CR>
+nnoremap <leader>r :AIRedo<CR> " redo last AI command
 
 " Autocommands
 augroup LargeFile

@@ -13,7 +13,7 @@ highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE
 
 " set background=light or dark depending on gnome system theme
-let output = systemlist(['gsettings', 'get', 'org.gnome.desktop.interface', 'color-scheme'])[0]
+let output = systemlist(['dconf', 'read', '/org/gnome/desktop/interface/color-scheme'])[0]
 let isDark = (output == "'prefer-dark'")
 if isDark
   set background=dark

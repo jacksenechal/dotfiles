@@ -14,22 +14,11 @@ def set_neovim_background(mode):
     command = f"<Esc>:set background={background}<CR>"
     
     # Find the unix sockets for all running neovim instances and send the command to them
-    output = subprocess.getoutput("lsof -Fpcn -U 2>/dev/null").split("\n")
-    sockets = []
-    cmd_name = ""
-    for line in output:
-        if line.startswith('c'):  # We only care about lines that start with 'c', which are the command names
-            cmd_name = line[1:]  # Remove the 'c' prefix
-        elif line.startswith('n'):  # We only care about lines that start with 'n', which are the file names
-            if cmd_name == 'nvim':
-                socket = line[1:]  # Remove the 'n' prefix
-                socket = socket.split(' ')[0]  # Remove everything after the first space
-                sockets.append(socket)
-                cmd_name = ""
+    sockets = subprocess.getoutput("nvr --serverlist").split("\n")
 
     for socket in sockets:
         print(f"Sending command to {socket}: '{command}'")
-        subprocess.run(["nvim", "--server", socket, "--remote-send", f"'{command}'"])
+        subprocess.run(["nvim", "--server", socket, "--remote-send", f"'{command}'"], stdout=subprocess.DEVNULL)
 
 def update_settings(mode):
     set_legacy_theme(mode)

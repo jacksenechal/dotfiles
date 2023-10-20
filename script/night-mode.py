@@ -24,16 +24,25 @@ def update_settings(mode):
     set_legacy_theme(mode)
     set_neovim_background(mode)
 
+def set_system_theme(mode):
+    subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'{mode}'"])
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--manual', choices=['light', 'dark'], help='Override the is_dark variable')
+    parser.add_argument('-u', '--update', choices=['light', 'dark'], help='Update settings (regardless of system theme)')
+    parser.add_argument('-t', '--theme', choices=['light', 'dark'], help='Set the system theme and update settings')
     args = parser.parse_args()
 
     last_mode = None
 
     while True:
-        if args.manual:
-            mode = args.manual
+        if args.update:
+            mode = args.update
+            update_settings(mode)
+            break
+        elif args.theme:
+            mode = args.theme
+            set_system_theme(mode)
             update_settings(mode)
             break
         else:

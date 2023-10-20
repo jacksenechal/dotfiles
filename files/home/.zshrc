@@ -118,3 +118,5 @@ eval $(keychain -q --eval id_rsa)
 source ~/.bash_aliases_jack
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[ -d ~/.rbenv ] && eval "$(~/.rbenv/bin/rbenv init - zsh)"

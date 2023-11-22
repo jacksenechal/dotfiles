@@ -155,3 +155,4 @@ augroup LargeFile
         \ | let b:codeium_enabled = v:false
         \ | endif
 augroup END
+autocmd VimResized * wincmd =

@@ -156,3 +156,10 @@ augroup LargeFile
         \ | endif
 augroup END
 autocmd VimResized * wincmd =
+" Automatically reload files that were changed outside of Neovim
+autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * if mode() != 'c' | checktime | endif
+autocmd FileChangedShellPost * echo "File changed on disk. Buffer reloaded."
+set updatetime=300
+" Auto write buffers
+set autowriteall
+autocmd BufLeave * silent! wall

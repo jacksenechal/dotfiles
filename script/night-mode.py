@@ -10,17 +10,17 @@ def set_legacy_theme(mode):
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/gtk-theme", f"'{theme}'"])
 
 def set_neovim_background(mode):
-    background = "dark" if mode == "dark" else "light"
-    command = f"<Esc>:set background={background}<CR>"
+    command = f"set background={mode}"
     
     # Find the unix sockets for all running neovim instances and send the command to them
     sockets = subprocess.getoutput("nvr --serverlist").split("\n")
 
     for socket in sockets:
         print(f"Sending command to {socket}: '{command}'")
-        subprocess.run(["nvim", "--server", socket, "--remote-send", f"'{command}'"], stdout=subprocess.DEVNULL)
+        subprocess.run(["nvim", "--server", socket, "--remote-expr", f"execute('{command}')"], stdout=subprocess.DEVNULL)
 
 def update_settings(mode):
+    print(f"Updating settings to {mode}")
     set_legacy_theme(mode)
     set_neovim_background(mode)
 
@@ -30,7 +30,7 @@ def set_system_theme(mode):
 def get_system_theme():
     output = subprocess.getoutput("dconf read /org/gnome/desktop/interface/color-scheme")
     is_dark = (output == "'prefer-dark'")
-    "dark" if is_dark else "light"
+    return "dark" if is_dark else "light"
 
 def main():
     parser = argparse.ArgumentParser()
@@ -50,7 +50,8 @@ def main():
         set_system_theme(mode)
         update_settings(mode)
     else:
-        last_mode = None
+        print("Waiting for system theme change...")
+        last_mode = get_system_theme()
 
         while True:
             mode = get_system_theme()

@@ -74,7 +74,8 @@
       dest: start/vim-ai
     # - repo: https://github.com/nvim-treesitter/nvim-treesitter
     #   dest: start/nvim-treesitter
-    # note: opt plugins are not loaded automatically
+    # note: opt plugins are not loaded automatically. run them with:
+	  #   :packadd! fooextra
     # note: if you move something here, delete it manually from start/
     #       ... and vice versa
     - repo: https://github.com/hashivim/vim-packer

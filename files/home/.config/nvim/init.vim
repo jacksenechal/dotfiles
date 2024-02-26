@@ -1,7 +1,12 @@
 " Configuration
 syntax enable
 filetype plugin indent on
-set clipboard+=unnamedplus
+
+" Yank to system clipboard only for explicit yanks
+augroup YankToClipboard
+  autocmd!
+  autocmd TextYankPost * if v:event.operator ==# 'y' && v:event.regname ==# '' | call system('xclip -selection clipboard', @") | endif
+augroup END
 
 " Appearance
 set number
@@ -73,6 +78,14 @@ endfunction
 " Commands
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 command! -nargs=0 GHdiff call GHDiffCommand()
+
+" Gutentags settings
+let g:gutentags_cache_dir = '~/.tmp/gutentags'
+let g:gutentags_generate_on_new = 1
+let g:gutentags_generate_on_missing = 1
+let g:gutentags_generate_on_write = 1
+let g:gutentags_generate_on_empty_buffer = 0
+let g:gutentags_ctags_exclude = ['*.css', '*.html', '*.js', '*.json', '*.xml', '*.phar', '*.ini', '*.rst', '*.md', '*.lock', '*.bundle', '*.map', '*.pyc', '*.zip', '*/vendor/*', '*/node_modules/*', '*/.git/*']
 
 " Make Ag search everything
 " Default options are --nogroup --column --color

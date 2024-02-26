@@ -27,34 +27,37 @@ def update_settings(mode):
 def set_system_theme(mode):
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'{mode}'"])
 
+def get_system_theme():
+    output = subprocess.getoutput("dconf read /org/gnome/desktop/interface/color-scheme")
+    is_dark = (output == "'prefer-dark'")
+    "dark" if is_dark else "light"
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--update', choices=['light', 'dark'], help='Update settings (regardless of system theme)')
-    parser.add_argument('-t', '--theme', choices=['light', 'dark'], help='Set the system theme and update settings')
+    parser.add_argument('-u', '--update', choices=['light', 'dark'], help='Update settings (regardless of system theme), then exit')
+    parser.add_argument('-t', '--theme', choices=['light', 'dark'], help='Set the system theme and update settings, then exit')
+    parser.add_argument('-o', '--once', help='Update settings according to system theme, then exit', action='store_true')
     args = parser.parse_args()
 
-    last_mode = None
+    if args.once:
+        mode = get_system_theme()
+        update_settings(mode)
+    elif args.update:
+        mode = args.update
+        update_settings(mode)
+    elif args.theme:
+        mode = args.theme
+        set_system_theme(mode)
+        update_settings(mode)
+    else:
+        last_mode = None
 
-    while True:
-        if args.update:
-            mode = args.update
-            update_settings(mode)
-            break
-        elif args.theme:
-            mode = args.theme
-            set_system_theme(mode)
-            update_settings(mode)
-            break
-        else:
-            output = subprocess.getoutput("dconf read /org/gnome/desktop/interface/color-scheme")
-            is_dark = (output == "'prefer-dark'")
-            mode = "dark" if is_dark else "light"
-
-        if mode != last_mode:
-            update_settings(mode)
-            last_mode = mode
-
-        time.sleep(1)  # Check every second
+        while True:
+            mode = get_system_theme()
+            if mode != last_mode:
+                update_settings(mode)
+                last_mode = mode
+            time.sleep(1)  # Check every second
 
 
 if __name__ == "__main__":

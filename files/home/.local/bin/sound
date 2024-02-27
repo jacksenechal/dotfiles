@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Define your devices here
+declare -A devices
+devices["headset"]="1488 1487"
+devices["speaker"]="1506 74"
+
+# Get the device pair from the first script argument
+device_pair=${devices[$1]}
+
+if [ -z "$device_pair" ]; then
+  echo "Device pair not found"
+  exit 1
+fi
+
+# Split the device pair into input and output device names
+IFS=' ' read -ra device <<< "$device_pair"
+input_device_id=${device[0]}
+output_device_id=${device[1]}
+
+if [ -z "$input_device_id" ]; then
+  echo "Input device not found"
+  exit 1
+fi
+
+if [ -z "$output_device_id" ]; then
+  echo "Output device not found"
+  exit 1
+fi
+
+# Set the default input and output devices
+pactl set-default-source $input_device_id
+pactl set-default-sink $output_device_id
+
+echo "Default input and output devices have been set to $1"
+

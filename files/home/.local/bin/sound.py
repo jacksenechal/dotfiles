@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import subprocess
 import sys
 import json
@@ -34,10 +35,62 @@ def set_default_devices(input_device_id, output_device_id):
     set_default_device(input_device_id, 'source')
     set_default_device(output_device_id, 'sink')
 
+def get_current_default_devices():
+    """Get the current default input and output devices."""
+    input_device = run_command(['pactl', 'get-default-source']).strip()
+    output_device = run_command(['pactl', 'get-default-sink']).strip()
+    return input_device, output_device
+
+def add_device_pair_to_config(config_directory, config_path, device_name, input_device, output_device):
+    """Add a new device pair to the configuration file."""
+    if not os.path.exists(config_directory):
+        os.makedirs(config_directory)
+    if not os.path.isfile(config_path):
+        with open(config_path, 'w') as config_file:
+            json.dump({}, config_file, indent=4)
+
+    with open(config_path, 'r+') as config_file:
+        try:
+            config = json.load(config_file)
+            config[device_name] = {
+                "input_device": input_device,
+                "output_device": output_device
+            }
+            config_file.seek(0)
+            json.dump(config, config_file, indent=4)
+            config_file.truncate()
+        except json.JSONDecodeError as e:
+            print(f"Error parsing configuration file: {e}")
+            sys.exit(1)
+
 def main():
     """Main function to set the default input and output devices based on the device name."""
+    parser = argparse.ArgumentParser(description='Set the default input and output devices based on the device name.')
+    parser.add_argument('device_name', help='The name of the device pair to set as default', nargs='?')
+    parser.add_argument('-a', '--add', help='Add the currently selected default device pair to the config', type=str, metavar='device_name')
+    args = parser.parse_args()
+
     config_directory = os.path.join(os.path.expanduser('~'), '.config')
     config_path = os.path.join(config_directory, 'sound_devices.json')
+
+    if not vars(args):
+        parser.print_help()
+        sys.exit(1)
+
+    if args.add:
+        device_name = args.add
+        if device_name is None:
+            print("Please provide a device name to add.")
+            sys.exit(1)
+        input_device, output_device = get_current_default_devices()
+        add_device_pair_to_config(config_directory, config_path, device_name, input_device, output_device)
+        print(f"Added current default devices as '{device_name}' to the configuration.")
+        sys.exit(0)
+
+    if args.device_name is None:
+        parser.print_help()
+        sys.exit(1)
+
     try:
         with open(config_path, 'r') as config_file:
             devices = json.load(config_file)
@@ -48,11 +101,7 @@ def main():
         print(f"Error parsing configuration file: {e}")
         sys.exit(1)
 
-    if len(sys.argv) != 2:
-        print("Usage: sound.py [device_name]")
-        sys.exit(1)
-
-    device_name = sys.argv[1]
+    device_name = args.device_name
     device_pair = devices.get(device_name)
 
     if not device_pair:
@@ -71,7 +120,7 @@ def main():
 
     set_default_devices(input_device_id, output_device_id)
 
-    print(f"Default input and output devices have been set to {device_name}")
+    print(f"Default input and output devices have been set to '{device_name}'")
 
 if __name__ == '__main__':
     main()

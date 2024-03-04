@@ -2,7 +2,8 @@
 - name: dotfiles
   hosts: all
   roles:
-    - nvim
+    - role: nvim
+      tags: nvim
   tasks:
     - block: # Update apt cache only once for the block, not for each task
       - name: Download GitHub CLI keyring

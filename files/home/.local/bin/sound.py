@@ -2,6 +2,8 @@
 
 import subprocess
 import sys
+import json
+import os
 
 def run_command(command):
     """Run a system command and return the output."""
@@ -34,16 +36,17 @@ def set_default_devices(input_device_id, output_device_id):
 
 def main():
     """Main function to set the default input and output devices based on the device name."""
-    devices = {
-            "headset": {
-                "input_device": "alsa_input.usb-0c76_USB_PnP_Audio_Device-00.mono-fallback",
-                "output_device": "alsa_output.usb-0c76_USB_PnP_Audio_Device-00.iec958-stereo"
-                },
-            "speaker": {
-                "input_device": "alsa_input.usb-046d_HD_Pro_Webcam_C920_12E8EDAF-02.iec958-stereo",
-                "output_device": "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__hw_sofhdadsp_3__sink"
-                }
-            }
+    config_directory = os.path.join(os.path.expanduser('~'), '.config')
+    config_path = os.path.join(config_directory, 'sound_devices.json')
+    try:
+        with open(config_path, 'r') as config_file:
+            devices = json.load(config_file)
+    except FileNotFoundError:
+        print(f"Configuration file not found: {config_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing configuration file: {e}")
+        sys.exit(1)
 
     if len(sys.argv) != 2:
         print("Usage: sound.py [device_name]")

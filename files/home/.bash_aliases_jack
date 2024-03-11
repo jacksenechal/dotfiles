@@ -1,6 +1,6 @@
 #
 
-tty -s && mesg n || true
+# tty -s && mesg n || true
 
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export OPENAI_API_KEY=$(cat /home/jack/.openai-key)

@@ -4,26 +4,3 @@
 [local:vars]
 ansible_connection=local
 ansible_user=jack
-
-[virtualbox]
-vbws # this relies on an entry in /etc/hosts pointed to 127.0.0.1, since virtualbox is NATed to port 2222 there
-
-[virtualbox:vars]
-ansible_user=dev
-ansible_port=2222
-
-# [multipass]
-# 10.178.98.115
-# 
-# [multipass:vars]
-# ansible_user=multipass
-# 
-# [p52]
-# 192.168.0.221
-# 
-# [p52:vars]
-# ansible_user=jack
-# ansible_port=22999
-# 
-# [vagrant-workstation]
-# vagrant-workstation

@@ -4,129 +4,63 @@
   roles:
     - role: nvim
       tags: nvim
-  tasks:
-    - block: # Update apt cache only once for the block, not for each task
-      - name: Download GitHub CLI keyring
-        become: true
-        shell: "curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg"
-        changed_when: false
-      - name: Create GitHub CLI repository configuration
-        become: true
-        lineinfile:
-          path: /etc/apt/sources.list.d/github-cli.list
-          line: "deb [arch={{ ansible_architecture }} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
-          create: yes
-        notify: Update apt cache
+    - role: tumbleweed
+      tags: tumbleweed
+    - role: files
+      tags: files
+  # tasks:
 
-      - name: Install the required packages
-        become: yes
-        ansible.builtin.apt:
-          pkg:
-          - neovim
-          - tmux
-          - rsync
-          - git
-          - silversearcher-ag
-          - ripgrep
-          - tree
-          - zsh
-          - keychain
-          - universal-ctags
-          - nodejs
-          - curl
-          - gh
-          - jq
-          - yamllint
-        notify: Update apt cache
-
-    - name: Copy config files into place
-      ansible.posix.synchronize:
-        src: files/home/
-        dest: ~/
-        recursive: yes
-        perms: yes
-        # rsync_opts:
-        #   - '--ignore-existing'
-
-    - name: Fetch ohmyzsh
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
-        dest: /tmp/ohmyzsh-install.sh
-    - name: Install ohmyzsh
-      ansible.builtin.shell: sh /tmp/ohmyzsh-install.sh --unattended
-      args:
-        creates: ~/.oh-my-zsh
+    # - name: Fetch ohmyzsh
+    #   ansible.builtin.get_url:
+    #     url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+    #     dest: /tmp/ohmyzsh-install.sh
+    # - name: Install ohmyzsh
+    #   ansible.builtin.shell: sh /tmp/ohmyzsh-install.sh --unattended
+    #   args:
+    #     creates: ~/.oh-my-zsh
 
 
-    - name: Replace line in /etc/pam.d/chsh
-      become: true
-      ansible.builtin.lineinfile:
-        path: /etc/pam.d/chsh
-        regexp: '^auth\s+required\s+pam_shells.so$'
-        line: 'auth       sufficient   pam_shells.so'
-        backup: yes
-    - name: Change default shell to zsh
-      become: true
-      ansible.builtin.command: chsh -s "/usr/bin/zsh" {{ ansible_user }}
+    # - name: Replace line in /etc/pam.d/chsh
+    #   become: true
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/pam.d/chsh
+    #     regexp: '^auth\s+required\s+pam_shells.so$'
+    #     line: 'auth       sufficient   pam_shells.so'
+    #     backup: yes
+    # - name: Change default shell to zsh
+    #   become: true
+    #   ansible.builtin.command: chsh -s "/usr/bin/zsh" {{ ansible_user }}
 
-    - name: Create temporary awscli directory
-      ansible.builtin.tempfile:
-        state: directory
-        suffix: awscli
-      register: awscli_dir
-    - name: Unzip AWS CLI
-      ansible.builtin.unarchive:
-        src: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-        dest: "{{ awscli_dir.path }}"
-        remote_src: yes
-    - name: Install AWS CLI
-      become: true
-      ansible.builtin.command: "{{ awscli_dir.path }}/aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update"
+    # - name: Set up kubectl
+    #   become: true
+    #   ansible.builtin.get_url:
+    #     url: https://storage.googleapis.com/kubernetes-release/release/v1.26.4/bin/linux/amd64/kubectl
+    #     dest: /usr/local/bin/kubectl
+    #     mode: '0755'
 
-    - name: Download and unzip terraform
-      become: true
-      ansible.builtin.unarchive:
-        src: "https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip"
-        dest: /usr/local/bin
-        remote_src: yes
-        creates: /usr/local/bin/terraform
-
-    - name: Set up kubectl
-      become: true
-      ansible.builtin.get_url:
-        url: https://storage.googleapis.com/kubernetes-release/release/v1.26.4/bin/linux/amd64/kubectl
-        dest: /usr/local/bin/kubectl
-        mode: '0755'
-
-    - name: Check if kctx exists
-      ansible.builtin.command: "kubectl ctx"
-      environment:
-        PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
-      register: kctx_result
-      ignore_errors: true
-    - block:
-      - name: Create temporary krew directory
-        ansible.builtin.tempfile:
-          state: directory
-          suffix: krew
-        register: krew_dir
-      - name: Download krew
-        ansible.builtin.unarchive:
-          src: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz"
-          dest: "{{ krew_dir.path }}"
-          remote_src: yes
-      - name: Install krew for kubectl
-        become: true
-        ansible.builtin.command: "{{ krew_dir.path }}/krew-linux_amd64 install krew"
-      - name: Set up kctx and kns
-        become: true
-        ansible.builtin.command: "kubectl krew install ctx ns"
-        environment:
-          PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
-      when: kctx_result.rc != 0
-
-  handlers:
-    - name: Update apt cache
-      become: true
-      ansible.builtin.apt:
-        update_cache: yes
+    # - name: Check if kctx exists
+    #   ansible.builtin.command: "kubectl ctx"
+    #   environment:
+    #     PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
+    #   register: kctx_result
+    #   ignore_errors: true
+    # - block:
+    #   - name: Create temporary krew directory
+    #     ansible.builtin.tempfile:
+    #       state: directory
+    #       suffix: krew
+    #     register: krew_dir
+    #   - name: Download krew
+    #     ansible.builtin.unarchive:
+    #       src: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-linux_amd64.tar.gz"
+    #       dest: "{{ krew_dir.path }}"
+    #       remote_src: yes
+    #   - name: Install krew for kubectl
+    #     become: true
+    #     ansible.builtin.command: "{{ krew_dir.path }}/krew-linux_amd64 install krew"
+    #   - name: Set up kctx and kns
+    #     become: true
+    #     ansible.builtin.command: "kubectl krew install ctx ns"
+    #     environment:
+    #       PATH: "{{ ansible_env.PATH }}:/home/{{ ansible_user }}/.krew/bin"
+    #   when: kctx_result.rc != 0

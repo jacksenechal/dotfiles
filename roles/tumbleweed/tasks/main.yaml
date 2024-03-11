@@ -1,0 +1,25 @@
+- name: Add third party repos
+  community.general.zypper_repository:
+    repo: 'https://cli.github.com/packages/rpm/gh-cli.repo'
+    state: present
+    runrefresh: yes
+  become: yes
+
+- name: Install the required packages
+  become: yes
+  community.general.zypper:
+    name:
+    - neovim
+    - tmux
+    - rsync
+    - git
+    - the_silver_searcher
+    - tree
+    - zsh
+    - keychain
+    - universal-ctags
+    - nodejs
+    - curl
+    - gh
+    - jq
+    # - yamllint

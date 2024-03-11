@@ -2,9 +2,6 @@
 
 tty -s && mesg n || true
 
-export DATABASE_HOST=127.0.0.1
-export DATABASE_USERNAME=bigmaven
-export PUMA_SSL_BIND=true
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export OPENAI_API_KEY=$(cat /home/jack/.openai-key)
 
@@ -12,15 +9,9 @@ export OPENAI_API_KEY=$(cat /home/jack/.openai-key)
 
 alias k=kubectl
 alias g=git
-alias pbcopy='xclip -selection clipboard'
-alias pbpaste='xclip -selection clipboard -o'
-alias kubeitup="cd ~/bootstrap-workstation && sudo mavenlink-kubeadm && bash utilities/full-stack-reset.sh"
+alias z=zypper
+alias xc='xclip -selection clipboard'
+alias xp='xclip -selection clipboard -o'
 alias kctx="kubectl ctx"
 alias kns="kubectl ns"
-alias mavenlink="cd ~/workspace/mavenlink"
-alias devops="cd ~/workspace/devops && devops"
-alias charts="cd ~/workspace/charts"
-alias bsw="cd ~/bootstrap-workstation"
-alias workstation-ssh='ssh -A multipass@$(multipass info workstation | grep IPv4 | cut -d: -f2 | xargs)'
 alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
-alias vb="ssh -AX jack@127.0.0.1 -p 2222"

@@ -1,0 +1,9 @@
+---
+- name: Copy config files into place
+  ansible.posix.synchronize:
+    src: files/home/
+    dest: ~/
+    recursive: yes
+    perms: yes
+    # rsync_opts:
+    #   - '--ignore-existing'

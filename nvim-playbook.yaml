@@ -1,5 +1,0 @@
----
-- name: nvim
-  hosts: all
-  roles:
-    - nvim

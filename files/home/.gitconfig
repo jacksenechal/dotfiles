@@ -1,5 +1,5 @@
 [user]
-  email = jsenechal@mavenlink.com
+  email = jack@tobikodata.com
   name = Jack Senechal
 [alias]
   st = status
@@ -7,10 +7,8 @@
   co = checkout
   ci = commit
   cw = whatchanged
-[hub]
-  host = mavenlink.com
 [core]
-  editor = vim
+  editor = nvim
   excludesFile = ~/.gitignore
 [diff]
   tool = vimdiff

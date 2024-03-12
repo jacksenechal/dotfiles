@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -e
+set -x
+
 # Define the primary modifier combination
 MODIFIER="<Control><Alt><Super>"
 
@@ -20,6 +23,12 @@ gsettings set org.gnome.desktop.wm.keybindings move-to-side-n "['${MODIFIER}Up']
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-s "['${MODIFIER}Down']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-e "['${MODIFIER}Right']"
 gsettings set org.gnome.desktop.wm.keybindings move-to-side-w "['${MODIFIER}Left']"
+
+# open gnome terminal the old way
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 'open-terminal'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 'gnome-terminal'
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding '<Control><Alt>t'
 
 # ## Harlan's tiling keybindings
 

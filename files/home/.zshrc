@@ -90,7 +90,6 @@ PROMPT=$PROMPT'$(kube_ps1) '
 # else
 #   export EDITOR='mvim'
 # fi
-export EDITOR='nvim'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -104,16 +103,10 @@ export EDITOR='nvim'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export KUBECONFIG=~/.kube/config
-export AWS_OKTA_BACKEND=secret-service
 source <(kubectl completion zsh)
-# source ~/workspace/bootstrap-workstation/ansible/templates/dot-chart-s3-env
-source ~/workspace/bootstrap-workstation/ansible/templates/dot-kube-ps1
 export GOPATH="$HOME/.local/go"
 path=("$HOME/.local/bin" "$GOPATH/bin" "${KREW_ROOT:-$HOME/.krew}/bin" "/opt/mssql-tools/bin/" $path)
 export PATH
-
-eval $(keychain -q --eval id_rsa)
 
 source ~/.bash_aliases_jack
 

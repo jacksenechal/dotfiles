@@ -16,6 +16,7 @@ alias xp='xclip -selection clipboard -o'
 alias kctx="kubectl ctx"
 alias kns="kubectl ns"
 alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
+alias dc='docker-compose'
 
 # make sure keychain is sourced in tmux and normal shell, to enable SSH agent access
 if [ -z "$TMUX" ]; then

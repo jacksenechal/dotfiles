@@ -1,0 +1,19 @@
+- name: Enable night-mode as a user service
+  systemd:
+    name: night-mode.service
+    scope: user
+    enabled: yes
+    daemon_reload: yes
+    state: restarted
+
+- name: Enable the docker service
+  systemd:
+    name: docker.service
+    enabled: yes
+    state: started
+- name: Ensure user is in the docker group
+  become: yes
+  user:
+    name: "{{ ansible_user }}"
+    append: yes
+    groups: docker

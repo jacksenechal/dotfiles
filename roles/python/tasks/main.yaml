@@ -1,0 +1,8 @@
+- name: Install global python packages with pipx
+  community.general.pipx:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - pre-commit
+    - neovim-remote
+    - aider-chat

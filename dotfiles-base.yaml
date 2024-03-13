@@ -8,6 +8,8 @@
       tags: tumbleweed
     - role: files
       tags: files
+    - role: python
+      tags: python
   # tasks:
 
     # - name: Fetch ohmyzsh

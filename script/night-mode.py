@@ -3,6 +3,7 @@
 import argparse
 import subprocess
 import time
+import os
 
 def set_legacy_theme(mode):
     theme = "Adwaita-dark" if mode == "dark" else "Adwaita"
@@ -19,10 +20,15 @@ def set_neovim_background(mode):
         print(f"Sending command to {socket}: '{command}'")
         subprocess.run(["nvim", "--server", socket, "--remote-expr", f"execute('{command}')"], stdout=subprocess.DEVNULL)
 
+def set_tmux_theme(mode):
+    config_file = os.path.expanduser(f"~/.config/tmux/tmux.{mode}.conf")
+    subprocess.run(["tmux", "source-file", config_file])
+
 def update_settings(mode):
     print(f"Updating settings to {mode}")
     set_legacy_theme(mode)
     set_neovim_background(mode)
+    set_tmux_theme(mode)
 
 def set_system_theme(mode):
     subprocess.run(["dconf", "write", "/org/gnome/desktop/interface/color-scheme", f"'{mode}'"])

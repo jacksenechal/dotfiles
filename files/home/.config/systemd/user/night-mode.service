@@ -1,0 +1,10 @@
+[Unit]
+Description=Night Mode Daemon
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/night-mode
+Restart=always
+
+[Install]
+WantedBy=default.target

@@ -10,6 +10,8 @@
       tags: files
     - role: python
       tags: python
+    - role: services
+      tags: services
   # tasks:
 
     # - name: Fetch ohmyzsh

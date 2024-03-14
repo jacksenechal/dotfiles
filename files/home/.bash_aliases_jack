@@ -4,19 +4,26 @@
 
 export EDITOR='nvim'
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
-export OPENAI_API_KEY=$(cat /home/jack/.openai-key)
+export OPENAI_API_KEY=$(cat ~/.config/openai.token)
+export AIDER_AUTO_COMMITS=false
+export AIDER_GITIGNORE=false
+export AIDER_DIRTY_COMMITS=false
+export AIDER_PRETTY=false
+export AIDER_4_TURBO=true
 
 # kubeoff
 
-alias k=kubectl
+alias dc='docker-compose'
+alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
 alias g=git
-alias z=zypper
-alias xc='xclip -selection clipboard'
-alias xp='xclip -selection clipboard -o'
+alias k=kubectl
 alias kctx="kubectl ctx"
 alias kns="kubectl ns"
-alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
-alias dc='docker-compose'
+alias ll='ls -al --color=auto'
+alias ls='ls --color=auto'
+alias xc='xclip -selection clipboard'
+alias xp='xclip -selection clipboard -o'
+alias z=zypper
 
 # make sure keychain is sourced in tmux and normal shell, to enable SSH agent access
 if [ -z "$TMUX" ]; then

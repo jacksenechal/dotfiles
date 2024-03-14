@@ -13,6 +13,7 @@ export AIDER_4_TURBO=true
 
 # kubeoff
 
+alias activate='source .venv/bin/activate'
 alias dc='docker-compose'
 alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
 alias g=git

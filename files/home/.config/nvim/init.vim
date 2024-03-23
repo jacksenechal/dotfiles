@@ -176,3 +176,6 @@ set updatetime=300
 " Auto write buffers
 set autowriteall
 autocmd BufLeave * silent! wall
+
+" source the lua side
+luafile ~/.config/nvim/initialize.lua

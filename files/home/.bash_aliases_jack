@@ -15,6 +15,7 @@ export AIDER_4_TURBO=true
 
 alias activate='source .venv/bin/activate'
 alias dc='docker-compose'
+alias dex='docker-compose exec dev'
 alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
 alias g=git
 alias k=kubectl

@@ -3,6 +3,7 @@ Description=Night Mode Daemon
 
 [Service]
 Type=simple
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin
 ExecStart=%h/.local/bin/night-mode
 Restart=always
 

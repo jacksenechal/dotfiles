@@ -26,12 +26,4 @@ alias ls='ls --color=auto'
 alias xc='xclip -selection clipboard'
 alias xp='xclip -selection clipboard -o'
 alias z=zypper
-
-# make sure keychain is sourced in tmux and normal shell, to enable SSH agent access
-if [ -z "$TMUX" ]; then
-  for key in ~/.ssh/id_*; do
-    eval $(keychain --quiet --eval "${key}")
-  done
-else
-  source ~/.keychain/${HOSTNAME}-sh
-fi
+alias zup='sudo zypper up'

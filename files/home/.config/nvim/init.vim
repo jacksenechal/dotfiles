@@ -52,6 +52,7 @@ set nofoldenable
 let g:vim_markdown_folding_disabled = 1
 let g:terraform_fmt_on_save = 1
 let g:fzf_history_dir = '~/.tmp/fzf-history'
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 
 " Key mappings
 nnoremap <silent> <C-p> :Files<CR>

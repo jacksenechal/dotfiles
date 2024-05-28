@@ -74,6 +74,8 @@
       dest: start/vim-ai
     - repo: https://github.com/sindrets/diffview.nvim.git
       dest: start/diffview.nvim
+    - repo: https://github.com/Vimjas/vim-python-pep8-indent.git
+      dest: start/vim-python-pep8-indent
     # - repo: https://github.com/nvim-treesitter/nvim-treesitter
     #   dest: start/nvim-treesitter
     # note: opt plugins are not loaded automatically. run them with:

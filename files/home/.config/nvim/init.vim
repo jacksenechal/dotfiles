@@ -159,6 +159,10 @@ xnoremap <leader>n :AINewChat<CR> " trigger new chat
 nnoremap <leader>n :AINewChat<CR>
 nnoremap <leader>r :AIRedo<CR> " redo last AI command
 
+" nvim-tree settings
+nnoremap <silent> <leader>e :NvimTreeToggle<cr>
+nnoremap <silent> <leader>f :NvimTreeFindFile<cr>
+
 " Autocommands
 augroup LargeFile
   autocmd!

@@ -28,6 +28,7 @@
   ansible.builtin.git:
     repo: "{{ item.repo }}"
     dest: "~/.local/share/nvim/site/pack/all/{{ item.dest }}"
+    version: "{{ item.version | default('HEAD') }}"
     clone: yes
     force: no
     depth: 1
@@ -40,6 +41,10 @@
       dest: start/github-colorscheme
     - repo: https://github.com/NLKNguyen/papercolor-theme
       dest: start/papercolor-theme
+    - repo: https://github.com/bluz71/vim-nightfly-colors
+      dest: start/nightfly-colors
+    - repo: https://github.com/folke/tokyonight.nvim
+      dest: start/tokyonight
     - repo: https://github.com/tpope/vim-commentary
       dest: start/vim-commentary
     - repo: https://github.com/tpope/vim-surround
@@ -48,6 +53,7 @@
       dest: start/vim-closetag
     - repo: https://github.com/junegunn/fzf
       dest: start/fzf
+      version: 0.52.1
     - repo: https://github.com/junegunn/fzf.vim
       dest: start/fzf.vim
     - repo: https://github.com/tpope/vim-fugitive
@@ -68,6 +74,7 @@
       dest: start/copilot.vim
     - repo: https://github.com/Exafunction/codeium.vim
       dest: start/codeium.vim
+      version: 289eb72
     - repo: https://github.com/dense-analysis/ale.git
       dest: start/ale
     - repo: https://github.com/madox2/vim-ai.git

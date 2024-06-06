@@ -12,7 +12,7 @@ augroup END
 set number
 set cursorline
 set termguicolors
-colo PaperColor
+" colo PaperColor
 " set background=dark
 highlight Normal ctermbg=NONE
 highlight nonText ctermbg=NONE

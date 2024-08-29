@@ -1,10 +1,12 @@
 #
 
 # tty -s && mesg n || true
+shopt -s expand_aliases
 
 export EDITOR='nvim'
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export OPENAI_API_KEY=$(cat ~/.config/openai.token)
+export ANTHROPIC_API_KEY=$(cat ~/.config/anthropic.token)
 export AIDER_AUTO_COMMITS=false
 export AIDER_GITIGNORE=false
 export AIDER_DIRTY_COMMITS=false
@@ -14,16 +16,16 @@ export AIDER_4_TURBO=true
 # kubeoff
 
 alias activate='source .venv/bin/activate'
-alias dc='docker-compose'
+# alias dc='docker-compose'
 alias dex='docker-compose exec dev'
 alias dirty='cd ~/workspace/ && ls -1d */ | xargs -I {} bash -c "cd ~/workspace/{} && pwd && git status"'
-alias g=git
-alias k=kubectl
-alias kctx="kubectl ctx"
-alias kns="kubectl ns"
+# alias g=git
+# alias k=kubectl
+alias kctx='kubectl config use-context $(kubectl config get-contexts -o name | fzf)'
+alias kns='kubectl config set-context --current --namespace=$(kubectl get ns -o name | sed "s~^.*/~~" | fzf)'
 alias ll='ls -al --color=auto'
 alias ls='ls --color=auto'
 alias xc='xclip -selection clipboard'
 alias xp='xclip -selection clipboard -o'
-alias z=zypper
+# alias z=zypper
 alias zup='sudo zypper up'

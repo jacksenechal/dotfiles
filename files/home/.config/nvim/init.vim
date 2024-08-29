@@ -54,6 +54,8 @@ let g:terraform_fmt_on_save = 1
 let g:fzf_history_dir = '~/.tmp/fzf-history'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 
+let $BASH_ENV = "~/.bash_aliases_jack"
+
 " Key mappings
 nnoremap <silent> <C-p> :Files<CR>
 
@@ -151,17 +153,22 @@ let g:vim_ai_chat = {
 \    "temperature": 0.2,
 \  },
 \}
-nnoremap <leader>a :AI<CR> " complete text on the current line or in visual selection
-xnoremap <leader>a :AI<CR>
+" nnoremap <leader>a :AI<CR> " complete text on the current line or in visual selection
+" xnoremap <leader>a :AI<CR>
 xnoremap <leader>c :AIChat<CR> " trigger chat
 nnoremap <leader>c :AIChat<CR>
-xnoremap <leader>n :AINewChat<CR> " trigger new chat
-nnoremap <leader>n :AINewChat<CR>
-nnoremap <leader>r :AIRedo<CR> " redo last AI command
+" xnoremap <leader>n :AINewChat<CR> " trigger new chat
+" nnoremap <leader>n :AINewChat<CR>
+" nnoremap <leader>r :AIRedo<CR> " redo last AI command
 
 " nvim-tree settings
 nnoremap <silent> <leader>e :NvimTreeToggle<cr>
 nnoremap <silent> <leader>f :NvimTreeFindFile<cr>
+
+" diffview settings
+
+nnoremap <silent> <leader>do :DiffviewOpen<cr>
+nnoremap <silent> <leader>dc :DiffviewClose<cr>
 
 " Autocommands
 augroup LargeFile

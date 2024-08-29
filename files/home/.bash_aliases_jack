@@ -7,6 +7,7 @@ export EDITOR='nvim'
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 export OPENAI_API_KEY=$(cat ~/.config/openai.token)
 export ANTHROPIC_API_KEY=$(cat ~/.config/anthropic.token)
+export GROQ_API_KEY=$(cat ~/.config/groq.token)
 export AIDER_AUTO_COMMITS=false
 export AIDER_GITIGNORE=false
 export AIDER_DIRTY_COMMITS=false

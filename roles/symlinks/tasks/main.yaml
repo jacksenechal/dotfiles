@@ -1,0 +1,23 @@
+---
+- name: Check on existence of tools to symlink
+  stat:
+    path: "{{ item.src }}"
+  register: result
+  loop:
+    - src: /usr/bin/git
+      dest: ~/.local/bin/g
+    - src: /usr/bin/zypper
+      dest: ~/.local/bin/z
+    - src: /usr/bin/kubectl
+      dest: ~/.local/bin/k
+    - src: /usr/bin/docker-compose
+      dest: ~/.local/bin/dc
+
+- name: Create shortcut symlinks
+  ansible.builtin.file:
+    src: "{{ item.item.src }}"
+    dest: "{{ item.item.dest }}"
+    state: link
+    force: yes
+  loop: "{{ result.results }}"
+  when: item.stat.exists

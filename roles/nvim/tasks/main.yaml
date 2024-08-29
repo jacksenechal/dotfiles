@@ -3,12 +3,11 @@
     repo: https://github.com/junegunn/fzf.git
     dest: ~/.fzf
     clone: yes
-    force: no
+    force: yes
     depth: 1
+    version: master
 - name: Install fzf
   ansible.builtin.shell: ~/.fzf/install --all --no-update-rc --no-bash --no-fish
-  args:
-    creates: ~/.fzf/bin/fzf
 
 - name: Make VIM dirs
   ansible.builtin.file:

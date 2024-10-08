@@ -19,10 +19,11 @@ MAILTO=jack
 
 # rkhunter scans for rootkits and suspicious activity. Email notification
 # configured in /etc/rkhunter.conf. See /var/log/rkhunter.log.
-0 2 * * * 	root 	rkhunter --cronjob > /dev/null 2>&1
+0 2 * * *       root    rkhunter --cronjob > /dev/null 2>&1
 # clamdscan scans for viruses. Any infected files will be mailed to the user
 # specified above.
-# 0 3 * * *	root	clamdscan --stdout --no-summary --infected /
-* * * * *	root	clamdscan --stdout --no-summary --infected --remove /home/jack/Downloads
+# 0 3 * * *     root    clamdscan --stdout --no-summary --infected /
+* * * * *       root    clamdscan --stdout --no-summary --infected --remove /home/jack/Down
+loads
 # zypper update nightly
-0 4 * * *       root    /home/jack/.local/bin/update_zypper_and_rkhunter.sh
+0 4 * * *       root    /home/jack/.local/bin/update_zypper_and_rkhunter

@@ -5,6 +5,7 @@ import subprocess
 import sys
 import json
 import os
+from pprint import pprint
 
 def run_command(command):
     """Run a system command and return the output."""
@@ -16,13 +17,25 @@ def run_command(command):
         print(f"Error message: {e}")
         sys.exit(1)
 
-def get_device_id(device_name, device_type):
-    """Get the device ID for a given device name and type."""
-    command = ['pactl', 'list', 'short', device_type]
+def get_device_id(device_description, device_type):
+    """Get the device ID for a given device description and type."""
+    command = ['pactl', '--format', 'json', 'list', device_type]
     output = run_command(command)
-    for line in output.split('\n'):
-        if device_name in line:
-            return line.split('\t')[0]
+    devices = json.loads(output)
+    for device in devices:
+        if device.get('description') == device_description:
+            return device['name']
+    return None
+
+def get_device_description(device_name):
+    """Get the device description for a given device name."""
+    device_type = 'sources' if 'input' in device_name else 'sinks'
+    command = ['pactl', '--format', 'json', 'list', device_type]
+    output = run_command(command)
+    devices = json.loads(output)
+    for device in devices:
+        if device['name'] == device_name:
+            return device.get('description')
     return None
 
 def set_default_device(device_id, device_type):
@@ -49,12 +62,15 @@ def add_device_pair_to_config(config_directory, config_path, device_name, input_
         with open(config_path, 'w') as config_file:
             json.dump({}, config_file, indent=4)
 
+    input_description = get_device_description(input_device)
+    output_description = get_device_description(output_device)
+
     with open(config_path, 'r+') as config_file:
         try:
             config = json.load(config_file)
             config[device_name] = {
-                "input_device": input_device,
-                "output_device": output_device
+                "input_device": input_description,
+                "output_device": output_description
             }
             config_file.seek(0)
             json.dump(config, config_file, indent=4)
@@ -63,17 +79,40 @@ def add_device_pair_to_config(config_directory, config_path, device_name, input_
             print(f"Error parsing configuration file: {e}")
             sys.exit(1)
 
+def display_config(config_path):
+    """Display the contents of the configuration file in a readable format."""
+    try:
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+            print("Sound Device Configurations:")
+            print("----------------------------")
+            for device_name, device_config in config.items():
+                print(f"\nDevice Name: {device_name}")
+                print(f"  Input Device:  {device_config['input_device']}")
+                print(f"  Output Device: {device_config['output_device']}")
+    except FileNotFoundError:
+        print(f"Configuration file not found: {config_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing configuration file: {e}")
+        sys.exit(1)
+
 def main():
     """Main function to set the default input and output devices based on the device name."""
     parser = argparse.ArgumentParser(description='Set the default input and output devices based on the device name.')
     parser.add_argument('device_name', help='The name of the device pair to set as default', nargs='?')
     parser.add_argument('-a', '--add', help='Add the currently selected default device pair to the config', type=str, metavar='device_name')
+    parser.add_argument('-l', '--list', action='store_true', help='Display the contents of the configuration file')
     args = parser.parse_args()
 
     config_directory = os.path.join(os.path.expanduser('~'), '.config')
     config_path = os.path.join(config_directory, 'sound_devices.json')
 
-    if not vars(args):
+    if args.list:
+        display_config(config_path)
+        sys.exit(0)
+
+    if not vars(args) or (not args.device_name and not args.add):
         parser.print_help()
         sys.exit(1)
 
@@ -108,11 +147,11 @@ def main():
         print(f"Device pair not found: {device_name}")
         sys.exit(1)
 
-    input_device = device_pair["input_device"]
-    output_device = device_pair["output_device"]
+    input_device_description = device_pair["input_device"]
+    output_device_description = device_pair["output_device"]
 
-    input_device_id = get_device_id(input_device, 'sources')
-    output_device_id = get_device_id(output_device, 'sinks')
+    input_device_id = get_device_id(input_device_description, 'sources')
+    output_device_id = get_device_id(output_device_description, 'sinks')
 
     if not input_device_id or not output_device_id:
         print("Device ID not found")

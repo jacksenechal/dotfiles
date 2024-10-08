@@ -23,3 +23,17 @@
     - gh
     - jq
     # - yamllint
+
+- name: Copy root config files into place
+  become: yes
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    perms: yes
+  loop:
+    - src: files/root/clamd.conf
+      dest: /etc/clamd.conf
+    - src: files/root/crontab
+      dest: /etc/crontab
+    - src: files/root/rkhunter.conf
+      dest: /etc/rkhunter.conf

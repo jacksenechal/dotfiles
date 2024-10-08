@@ -16,7 +16,7 @@ export GROQ_API_KEY=$(cat ~/.config/groq.token)
 
 # kubeoff
 
-alias aider='pipx upgrade git+https://github.com/paul-gauthier/aider.git && aider'
+# alias aider='pipx upgrade aider-chat && aider'
 alias activate='source .venv/bin/activate'
 # alias dc='docker-compose'
 alias dex='docker-compose exec dev'

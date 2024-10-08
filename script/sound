@@ -97,12 +97,33 @@ def display_config(config_path):
         print(f"Error parsing configuration file: {e}")
         sys.exit(1)
 
+def remove_device_from_config(config_path, device_name):
+    """Remove a device pair from the configuration file."""
+    try:
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+        
+        if device_name in config:
+            del config[device_name]
+            with open(config_path, 'w') as config_file:
+                json.dump(config, config_file, indent=4)
+            print(f"Device '{device_name}' has been removed from the configuration.")
+        else:
+            print(f"Device '{device_name}' not found in the configuration.")
+    except FileNotFoundError:
+        print(f"Configuration file not found: {config_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing configuration file: {e}")
+        sys.exit(1)
+
 def main():
     """Main function to set the default input and output devices based on the device name."""
     parser = argparse.ArgumentParser(description='Set the default input and output devices based on the device name.')
     parser.add_argument('device_name', help='The name of the device pair to set as default', nargs='?')
     parser.add_argument('-a', '--add', help='Add the currently selected default device pair to the config', type=str, metavar='device_name')
     parser.add_argument('-l', '--list', action='store_true', help='Display the contents of the configuration file')
+    parser.add_argument('-r', '--remove', help='Remove a device pair from the configuration', type=str, metavar='device_name')
     args = parser.parse_args()
 
     config_directory = os.path.join(os.path.expanduser('~'), '.config')
@@ -110,6 +131,10 @@ def main():
 
     if args.list:
         display_config(config_path)
+        sys.exit(0)
+
+    if args.remove:
+        remove_device_from_config(config_path, args.remove)
         sys.exit(0)
 
     if not vars(args) or (not args.device_name and not args.add):

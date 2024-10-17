@@ -135,7 +135,7 @@ sonnet: true
 #light-mode: false
 
 ## Enable/disable pretty, colorized output (default: True)
-pretty: false
+# pretty: false
 
 ## Enable/disable streaming responses (default: True)
 #stream: true
@@ -291,4 +291,4 @@ check-update: false
 #gui: false
 
 ## Enable/disable suggesting shell commands (default: True)
-suggest-shell-commands: false
+# suggest-shell-commands: false

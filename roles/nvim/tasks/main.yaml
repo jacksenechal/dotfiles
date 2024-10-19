@@ -7,7 +7,12 @@
     depth: 1
     version: master
 - name: Install fzf
-  ansible.builtin.shell: ~/.fzf/install --all --no-update-rc --no-bash --no-fish
+  ansible.builtin.shell: ~/.fzf/install --all --no-update-rc --no-fish
+- name: Download fzf-git.sh
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh
+    dest: ~/.fzf-git.sh
+    mode: '0644'
 
 - name: Make VIM dirs
   ansible.builtin.file:
@@ -73,7 +78,7 @@
       dest: start/copilot.vim
     - repo: https://github.com/Exafunction/codeium.vim
       dest: start/codeium.vim
-      version: 289eb72
+      # version: 289eb72
     - repo: https://github.com/dense-analysis/ale.git
       dest: start/ale
     - repo: https://github.com/madox2/vim-ai.git

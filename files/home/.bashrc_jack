@@ -1,0 +1,23 @@
+#
+# This file contains additions to the default .bashrc provided by the OS. All
+# user-specific bash additions should go in this file. Aliases and ENVs can go
+# in ~/.bash_aliases_jack.
+#
+
+PS1='[\u@\h \W]\$ '
+
+# Set up fzf key bindings and fuzzy completion
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+[ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
+
+# Set up rbenv
+eval "$(rbenv init - bash)"
+
+# Created by `pipx` on 2023-09-10 05:14:47
+export PATH="$PATH:/home/jack/.local/bin:/home/jack/.local/bin/pulumi"
+eval "$(register-python-argcomplete pipx)"
+
+if [ -f ~/.bash_aliases_jack ]; then
+    . ~/.bash_aliases_jack
+fi

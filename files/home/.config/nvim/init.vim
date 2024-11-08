@@ -53,6 +53,7 @@ let g:vim_markdown_folding_disabled = 1
 let g:terraform_fmt_on_save = 1
 let g:fzf_history_dir = '~/.tmp/fzf-history'
 let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+let g:ruby_indent_assignment_style = 'variable'
 
 let $BASH_ENV = "~/.bash_aliases_jack"
 

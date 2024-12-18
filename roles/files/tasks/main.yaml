@@ -8,3 +8,9 @@
     # rsync_opts:
     #   - '--ignore-existing'
 
+
+- name: Ensure bashrc line exists
+  ansible.builtin.lineinfile:
+    path: ~/.bashrc
+    line: "[ -f ~/.bashrc_jack ] && source ~/.bashrc_jack"
+    state: present

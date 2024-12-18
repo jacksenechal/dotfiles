@@ -1,3 +1,14 @@
+# TODO move this to an ubuntu-workstation setup role
+- name: Install pip for Python 3 using apt
+  become: true
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3-pip
+    - python3-pynvim
+    - pipx
+
 - name: Install global python packages with pipx
   community.general.pipx:
     name: "{{ item }}"

@@ -57,7 +57,6 @@
       dest: start/vim-closetag
     - repo: https://github.com/junegunn/fzf
       dest: start/fzf
-      version: 0.52.1
     - repo: https://github.com/junegunn/fzf.vim
       dest: start/fzf.vim
     - repo: https://github.com/tpope/vim-fugitive

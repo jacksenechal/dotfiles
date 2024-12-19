@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Exit on error
+set -e
+
+# Install prerequisites and Ansible
+echo "Installing Ansible and prerequisites..."
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+sudo apt install -y ansible git
+
+# Clone dotfiles repository
+mkdir -p "$HOME/workspace"
+if [ ! -d "$HOME/workspace/dotfiles" ]; then
+  echo "Cloning dotfiles repository..."
+  git clone git@github.com:jacksenechal/dotfiles "$HOME/workspace/dotfiles"
+else
+  echo "dotfiles repository already cloned."
+fi
+
+# Run Ansible playbook
+echo "Running Ansible playbook..."
+ansible-playbook -K "$HOME/workspace/dotfiles/ubuntu-base.yaml"
+
+echo "Bootstrap complete."

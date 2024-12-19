@@ -8,16 +8,21 @@ PS1='[\u@\h \W]\$ '
 
 # Set up fzf key bindings and fuzzy completion
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
 
 # Set up rbenv
 eval "$(rbenv init - bash)"
 
-# Created by `pipx` on 2023-09-10 05:14:47
-export PATH="$PATH:/home/jack/.local/bin:/home/jack/.local/bin/pulumi"
+# Set up path
+export PATH="$PATH:/home/jack/.local/bin"
+
+# Set up pipx
 eval "$(register-python-argcomplete pipx)"
 
+# Set up keychain
+eval "$(keychain --eval --agents ssh id_github)"
+
+# Aliases
 if [ -f ~/.bash_aliases_jack ]; then
     . ~/.bash_aliases_jack
 fi

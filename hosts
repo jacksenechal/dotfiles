@@ -3,4 +3,3 @@
 
 [local:vars]
 ansible_connection=local
-ansible_user=jack

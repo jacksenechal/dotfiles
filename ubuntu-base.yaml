@@ -1,0 +1,58 @@
+---
+- name: Configure Ubuntu base system
+  hosts: local
+  become: false
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      become: true
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: yes
+      become: true
+
+    - name: Install required packages
+      apt:
+        name:
+          - build-essential
+          - curl
+          - docker.io
+          - keychain
+          - nodejs
+          - pipx
+          - unzip
+          - python3-pip
+          - python3-pynvim
+          - silversearcher-ag
+          - universal-ctags
+        state: present
+      become: true
+
+    - name: Install Neovim via snap
+      community.general.snap:
+        name: nvim
+        state: present
+        classic: true
+      become: true
+
+    - name: Add user to docker group
+      user:
+        name: "{{ lookup('env', 'USER') }}"
+        groups: docker
+        append: yes
+      become: true
+
+    - name: Restart docker service
+      systemd:
+        name: docker
+        state: restarted
+      become: true
+
+    - name: Reset connection to apply group changes
+      meta: reset_connection
+
+  roles:
+    - linux

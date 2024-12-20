@@ -55,7 +55,7 @@
 
 - name: Download API tokens from Bitwarden Secrets Manager
   shell: |
-    BWS_ACCESS_TOKEN=$(cat ~/.config/bws/access_token) bws secret get {{ item.secret_id }}  | jq '.value' > {{ ansible_env.HOME }}/.config/{{ item.file }}
+    BWS_ACCESS_TOKEN=$(cat ~/.config/bws/access_token) bws secret get {{ item.secret_id }}  | jq -r '.value' > {{ ansible_env.HOME }}/.config/{{ item.file }}
   loop:
     - { secret_id: "e4b96e83-6499-4124-ad50-b24b01783e6b", file: "anthropic.token" }
     - { secret_id: "d5c9c08d-4c75-45bc-af5a-b24b01787068", file: "openai.token" }

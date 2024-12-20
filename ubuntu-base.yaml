@@ -3,6 +3,39 @@
   hosts: local
   become: false
   pre_tasks:
+    - name: Install prerequisites for Docker repository
+      apt:
+        name:
+          - ca-certificates
+          - curl
+        state: present
+      become: true
+
+    - name: Create Docker keyring directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+      become: true
+
+    - name: Download Docker's GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: '0644'
+      become: true
+
+    - name: Set architecture fact
+      set_fact:
+        docker_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+        filename: docker
+      become: true
+
     - name: Update apt cache
       apt:
         update_cache: yes
@@ -19,7 +52,10 @@
         name:
           - build-essential
           - curl
-          - docker.io
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
           - keychain
           - nodejs
           - pipx
@@ -28,6 +64,7 @@
           - python3-pynvim
           - silversearcher-ag
           - universal-ctags
+          - docker-compose-plugin
         state: present
       become: true
 

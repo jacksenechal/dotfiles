@@ -5,10 +5,13 @@ shopt -s expand_aliases
 
 export EDITOR='nvim'
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
-[ -f ~/.config/openai.token ] && export OPENAI_API_KEY=$(cat ~/.config/openai.token)
-[ -f ~/.config/anthropic.token ] && export ANTHROPIC_API_KEY=$(cat ~/.config/anthropic.token)
-[ -f ~/.config/groq.token ] && export GROQ_API_KEY=$(cat ~/.config/groq.token)
-[ -f ~/.config/nvidia.token ] && export NVIDIA_API_KEY=$(cat ~/.config/nvidia.token)
+
+# export the API keys from ~/.config/keys
+for file in ~/.config/keys/*.key; do
+  filename=$(basename "$file" .key)
+  uppercase_name=$(echo "$filename" | tr '[:lower:]' '[:upper:]')
+  export "${uppercase_name}_API_KEY"=$(cat "$file")
+done
 
 # export AIDER_AUTO_COMMITS=false
 # export AIDER_GITIGNORE=false

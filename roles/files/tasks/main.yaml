@@ -5,6 +5,8 @@
     dest: ~/
     recursive: yes
     perms: yes
+    rsync_opts:
+      - '--itemize-changes'
     # rsync_opts:
     #   - '--ignore-existing'
 

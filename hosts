@@ -1,5 +1,8 @@
 [local]
 127.0.0.1
 
+[oracle]
+oracle
+
 [local:vars]
 ansible_connection=local

@@ -20,7 +20,9 @@ export PATH="$PATH:/home/jack/.local/bin"
 eval "$(register-python-argcomplete pipx)"
 
 # Set up keychain
-eval "$(keychain --eval --agents ssh id_github)"
+if [ -f /usr/local/bin/keychain ]; then
+  eval "$(keychain --eval --agents ssh id_github)" > /dev/null
+fi
 
 # Aliases
 if [ -f ~/.bash_aliases_jack ]; then

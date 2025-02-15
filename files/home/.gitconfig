@@ -123,16 +123,13 @@ new = green bold
 [core]
 # ignorecase = false
 autocrlf = false
-editor = code --wait
+editor = vim
 excludesfile = ~/.gitignore
 whitespace=fix,-indent-with-non-tab,trailing-space,cr-at-eol
 mergeoptions = --no-edit
 
 [diff]
 tool = vimdiff
-
-[difftool "code"]
-cmd = code --wait --diff $LOCAL $REMOTE
 
 [log]
 follow = true

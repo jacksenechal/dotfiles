@@ -77,19 +77,27 @@ vim.g.my_bg_mode = 'default'
 -- Define a variable to keep track of the current color scheme
 vim.g.my_colorscheme = vim.g.colors_name
 
--- Define a function to toggle the background mode
-function ToggleBackground()
-  if vim.g.my_bg_mode == 'default' then
-    -- Switch to transparent mode
+-- Define a function to apply the background mode
+function ApplyBackgroundMode()
+  if vim.g.my_bg_mode == 'transparent' then
     vim.cmd[[highlight Normal guibg=NONE ctermbg=NONE]]
     vim.cmd[[highlight NormalNC guibg=NONE ctermbg=NONE]]
     vim.cmd[[highlight nonText guibg=NONE ctermbg=NONE]]
+  else
+    vim.cmd('colorscheme ' .. vim.g.my_colorscheme)
+  end
+end
+
+-- Define a function to toggle the background mode
+function ToggleBackground()
+  if vim.g.my_bg_mode == 'default' then
     vim.g.my_bg_mode = 'transparent'
   else
-    -- Switch to default mode
-    vim.cmd('colorscheme ' .. vim.g.my_colorscheme)
     vim.g.my_bg_mode = 'default'
   end
+  ApplyBackgroundMode()
+  -- Write the current background mode to a file
+  vim.fn.writefile({vim.g.my_bg_mode}, vim.fn.stdpath('config') .. '/bg_mode')
 end
 
 -- Define a command to call the function
@@ -97,3 +105,15 @@ vim.cmd[[command! ToggleBG lua ToggleBackground()]]
 
 -- Define an autocmd to remember the current color scheme
 vim.cmd[[autocmd ColorScheme * let g:my_colorscheme = g:colors_name]]
+
+-- Define a function to load the background mode
+function LoadBackgroundMode()
+  local bg_mode_file = vim.fn.stdpath('config') .. '/bg_mode'
+  if vim.fn.filereadable(bg_mode_file) == 1 then
+    vim.g.my_bg_mode = vim.fn.readfile(bg_mode_file)[1]
+    ApplyBackgroundMode()
+  end
+end
+
+-- Call the function when Vim starts
+LoadBackgroundMode()

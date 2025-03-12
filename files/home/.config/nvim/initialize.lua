@@ -70,3 +70,30 @@ require("diffview").setup({
   },
 })
 
+------------------ colorscheme background toggle ------------------
+-- Define a variable to keep track of the current background mode
+vim.g.my_bg_mode = 'default'
+
+-- Define a variable to keep track of the current color scheme
+vim.g.my_colorscheme = vim.g.colors_name
+
+-- Define a function to toggle the background mode
+function ToggleBackground()
+  if vim.g.my_bg_mode == 'default' then
+    -- Switch to transparent mode
+    vim.cmd[[highlight Normal guibg=NONE ctermbg=NONE]]
+    vim.cmd[[highlight NormalNC guibg=NONE ctermbg=NONE]]
+    vim.cmd[[highlight nonText guibg=NONE ctermbg=NONE]]
+    vim.g.my_bg_mode = 'transparent'
+  else
+    -- Switch to default mode
+    vim.cmd('colorscheme ' .. vim.g.my_colorscheme)
+    vim.g.my_bg_mode = 'default'
+  end
+end
+
+-- Define a command to call the function
+vim.cmd[[command! ToggleBG lua ToggleBackground()]]
+
+-- Define an autocmd to remember the current color scheme
+vim.cmd[[autocmd ColorScheme * let g:my_colorscheme = g:colors_name]]

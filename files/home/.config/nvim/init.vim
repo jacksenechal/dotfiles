@@ -14,8 +14,9 @@ set cursorline
 set termguicolors
 " colo PaperColor
 " set background=dark
-highlight Normal ctermbg=NONE
-highlight nonText ctermbg=NONE
+" highlight Normal guibg=NONE ctermbg=NONE
+" highlight NormalNC guibg=NONE ctermbg=NONE
+" highlight nonText guibg=NONE ctermbg=NONE
 
 " set background=light or dark depending on gnome system theme
 " let output = systemlist(['dconf', 'read', '/org/gnome/desktop/interface/color-scheme'])[0]

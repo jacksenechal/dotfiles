@@ -21,8 +21,8 @@ def set_neovim_background(mode):
         subprocess.run(["nvim", "--server", socket, "--remote-expr", f"execute('{command}')"], stdout=subprocess.DEVNULL)
 
 def set_tmux_theme(mode):
-    config_file = os.path.expanduser(f"~/.config/tmux/tmux.{mode}.conf")
-    subprocess.run(["tmux", "source-file", config_file])
+    # config_file = os.path.expanduser(f"~/.config/tmux/tmux.{mode}.conf")
+    # subprocess.run(["tmux", "source-file", config_file])
 
 def update_settings(mode):
     print(f"Updating settings to {mode}")

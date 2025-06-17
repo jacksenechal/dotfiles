@@ -95,7 +95,7 @@ let g:gutentags_ctags_exclude = ['*.css', '*.html', '*.js', '*.json', '*.xml', '
 " Make Ag search everything
 " Default options are --nogroup --column --color
 let s:ag_options = '--hidden --skip-vcs-ignores --smart-case '
-command! -bang -nargs=* Ag
+command! -bang -nargs=* AgHidden
       \ call fzf#vim#ag(
       \   <q-args>,
       \   s:ag_options,
@@ -103,6 +103,13 @@ command! -bang -nargs=* Ag
       \        : fzf#vim#with_preview('right:50%:hidden', '?'),
       \   <bang>0
       \ )
+
+" Use gh to get PR files
+command! GhPrFiles call fzf#run(fzf#wrap({
+  \ 'source':  'gh pr diff --name-only',
+  \ 'sink':    'e',
+  \ 'options': '--prompt="PR Files> "'
+  \ }))
 
 " Codeium settings
 set statusline+=\|\{…\}%3{codeium#GetStatusString()}

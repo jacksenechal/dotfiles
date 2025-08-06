@@ -36,3 +36,5 @@ alias xc='xclip -selection clipboard'
 alias xp='xclip -selection clipboard -o'
 # alias z=zypper
 alias zup='sudo zypper up'
+alias gemini='unset GEMINI_API_KEY && npx https://github.com/google-gemini/gemini-cli'
+alias gemini-api='npx https://github.com/google-gemini/gemini-cli'

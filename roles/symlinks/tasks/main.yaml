@@ -22,18 +22,10 @@
   loop: "{{ result.results }}"
   when: item.stat.exists
 
-- name: Create script symlinks
+- name: Symlink all scripts in script/ to ~/.local/bin/
   ansible.builtin.file:
-    src: "{{ item.src | realpath }}"
-    dest: "{{ item.dest }}"
+    src: "{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item | basename }}"
     state: link
     force: yes
-  loop:
-    - src: script/night-mode
-      dest: ~/.local/bin/night-mode
-    - src: script/sound
-      dest: ~/.local/bin/sound
-    - src: script/update_zypper_and_rkhunter
-      dest: ~/.local/bin/update_zypper_and_rkhunter
-    - src: script/window_manager_settings
-      dest: ~/.local/bin/window_manager_settings
+  loop: "{{ lookup('fileglob', 'script/*', wantlist=True) }}"

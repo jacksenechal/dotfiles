@@ -10,14 +10,21 @@ PS1='[\u@\h \W]\$ '
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
 
-# Set up rbenv
-eval "$(rbenv init - bash)"
-
 # Set up path
 export PATH="$PATH:/home/jack/.local/bin"
 
+# Set up go
+export PATH="$PATH:$(go env GOPATH)/bin"
+
+# Set up rbenv
+eval "$(rbenv init - bash)"
+
 # Set up pipx
 eval "$(register-python-argcomplete pipx)"
+
+# Set up nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Set up keychain
 if [ -x "$(command -v keychain)" ]; then

@@ -6,6 +6,7 @@ import sys
 import json
 import os
 from pprint import pprint
+from difflib import get_close_matches
 
 def run_command(command):
     """Run a system command and return the output."""
@@ -37,6 +38,46 @@ def get_device_description(device_name):
         if device['name'] == device_name:
             return device.get('description')
     return None
+
+def find_fuzzy_match(target_description, device_type, cutoff=0.6):
+    """Find a fuzzy match for a device description."""
+    command = ['pactl', '--format', 'json', 'list', device_type]
+    output = run_command(command)
+    devices = json.loads(output)
+
+    available_descriptions = [device.get('description') for device in devices if device.get('description')]
+
+    matches = get_close_matches(target_description, available_descriptions, n=1, cutoff=cutoff)
+
+    if matches:
+        matched_description = matches[0]
+        for device in devices:
+            if device.get('description') == matched_description:
+                return device['name'], matched_description
+    return None, None
+
+def update_device_in_config(config_path, device_name, input_description=None, output_description=None):
+    """Update a device pair in the configuration file."""
+    try:
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
+
+        if device_name not in config:
+            print(f"Device '{device_name}' not found in configuration.")
+            return False
+
+        if input_description:
+            config[device_name]['input_device'] = input_description
+        if output_description:
+            config[device_name]['output_device'] = output_description
+
+        with open(config_path, 'w') as config_file:
+            json.dump(config, config_file, indent=4)
+
+        return True
+    except Exception as e:
+        print(f"Error updating configuration: {e}")
+        return False
 
 def set_default_device(device_id, device_type):
     """Set the default device for the given device ID and type."""
@@ -178,13 +219,64 @@ def main():
     input_device_id = get_device_id(input_device_description, 'sources')
     output_device_id = get_device_id(output_device_description, 'sinks')
 
-    if not input_device_id or not output_device_id:
-        print("Device ID not found")
-        sys.exit(1)
+    config_updated = False
+
+    # Handle fuzzy matching for input device if exact match fails
+    if not input_device_id:
+        print(f"\nExact match not found for input device: {input_device_description}")
+        print("Attempting fuzzy match...")
+        fuzzy_id, fuzzy_description = find_fuzzy_match(input_device_description, 'sources')
+
+        if fuzzy_id and fuzzy_description:
+            print(f"\nFound similar input device:")
+            print(f"  Old: {input_device_description}")
+            print(f"  New: {fuzzy_description}")
+            response = input("Use this device and update config? (y/n): ").strip().lower()
+
+            if response == 'y':
+                input_device_id = fuzzy_id
+                input_device_description = fuzzy_description
+                config_updated = True
+            else:
+                print("Device selection cancelled.")
+                sys.exit(1)
+        else:
+            print("No similar input device found.")
+            sys.exit(1)
+
+    # Handle fuzzy matching for output device if exact match fails
+    if not output_device_id:
+        print(f"\nExact match not found for output device: {output_device_description}")
+        print("Attempting fuzzy match...")
+        fuzzy_id, fuzzy_description = find_fuzzy_match(output_device_description, 'sinks')
+
+        if fuzzy_id and fuzzy_description:
+            print(f"\nFound similar output device:")
+            print(f"  Old: {output_device_description}")
+            print(f"  New: {fuzzy_description}")
+            response = input("Use this device and update config? (y/n): ").strip().lower()
+
+            if response == 'y':
+                output_device_id = fuzzy_id
+                output_device_description = fuzzy_description
+                config_updated = True
+            else:
+                print("Device selection cancelled.")
+                sys.exit(1)
+        else:
+            print("No similar output device found.")
+            sys.exit(1)
+
+    # Update config if fuzzy matches were accepted
+    if config_updated:
+        if update_device_in_config(config_path, device_name, input_device_description, output_device_description):
+            print(f"Configuration updated for '{device_name}'")
+        else:
+            print("Warning: Failed to update configuration, but continuing with device selection.")
 
     set_default_devices(input_device_id, output_device_id)
 
-    print(f"Default input and output devices have been set to '{device_name}'")
+    print(f"\nDefault input and output devices have been set to '{device_name}'")
 
 if __name__ == '__main__':
     main()

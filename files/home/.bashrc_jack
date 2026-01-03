@@ -14,20 +14,26 @@ PS1='[\u@\h \W]\$ '
 export PATH="$PATH:/home/jack/.local/bin"
 
 # Set up go
-export PATH="$PATH:$(go env GOPATH)/bin"
+if command -v go &> /dev/null; then
+  export PATH="$PATH:$(go env GOPATH)/bin"
+fi
 
 # Set up rbenv
-eval "$(rbenv init - bash)"
+if command -v rbenv &> /dev/null; then
+  eval "$(rbenv init - bash)"
+fi
 
 # Set up pipx
-eval "$(register-python-argcomplete pipx)"
+if command -v register-python-argcomplete &> /dev/null; then
+  eval "$(register-python-argcomplete pipx)"
+fi
 
 # Set up nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Set up keychain
-if [ -x "$(command -v keychain)" ]; then
+if [ -x "$(command -v keychain)" ] && [ -f ~/.ssh/id_github ]; then
   eval "$(keychain --eval --agents ssh id_github)" > /dev/null
 fi
 

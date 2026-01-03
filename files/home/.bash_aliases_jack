@@ -7,11 +7,14 @@ export EDITOR='nvim'
 export FZF_DEFAULT_COMMAND='ag --hidden --ignore .git -g ""'
 
 # export the API keys from ~/.config/keys
-for file in ~/.config/keys/*.key; do
-  filename=$(basename "$file" .key)
-  uppercase_name=$(echo "$filename" | tr '[:lower:]' '[:upper:]')
-  export "${uppercase_name}_API_KEY"=$(cat "$file")
-done
+if [ -d ~/.config/keys ]; then
+  for file in ~/.config/keys/*.key; do
+    [ -f "$file" ] || continue
+    filename=$(basename "$file" .key)
+    uppercase_name=$(echo "$filename" | tr '[:lower:]' '[:upper:]')
+    export "${uppercase_name}_API_KEY"=$(cat "$file")
+  done
+fi
 
 # export AIDER_AUTO_COMMITS=false
 # export AIDER_GITIGNORE=false

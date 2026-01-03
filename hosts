@@ -1,11 +1,8 @@
+oracle
+homebox
+
 [local]
 127.0.0.1
-
-[oracle]
-oracle
-
-[homebox]
-homebox
 
 [local:vars]
 ansible_connection=local

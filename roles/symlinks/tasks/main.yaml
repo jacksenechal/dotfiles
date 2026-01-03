@@ -25,7 +25,7 @@
 - name: Symlink all scripts in script/ to ~/.local/bin/
   ansible.builtin.file:
     src: "{{ item }}"
-    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item | basename }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin/{{ item | basename }}"
     state: link
     force: yes
   loop: "{{ lookup('fileglob', 'script/*', wantlist=True) }}"

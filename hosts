@@ -4,5 +4,8 @@
 [oracle]
 oracle
 
+[homebox]
+homebox
+
 [local:vars]
 ansible_connection=local

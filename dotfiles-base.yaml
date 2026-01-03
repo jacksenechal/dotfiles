@@ -38,7 +38,7 @@
     #     backup: yes
     # - name: Change default shell to zsh
     #   become: true
-    #   ansible.builtin.command: chsh -s "/usr/bin/zsh" {{ ansible_user }}
+    #   ansible.builtin.command: chsh -s "/usr/bin/zsh" {{ ansible_facts['user_id'] }}
 
     # - name: Set up kubectl
     #   become: true

@@ -2,20 +2,20 @@
 
 - name: Download and install bws CLI
   unarchive:
-    src: "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-{{ ansible_architecture }}-unknown-linux-gnu-1.0.0.zip"
-    dest: "{{ ansible_env.HOME }}/.local/bin"
+    src: "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-{{ ansible_facts['architecture'] }}-unknown-linux-gnu-1.0.0.zip"
+    dest: "{{ ansible_facts['env']['HOME'] }}/.local/bin"
     remote_src: yes
     mode: '0755'
 
 - name: Create bws config directory
   file:
-    path: "{{ ansible_env.HOME }}/.config/bws"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bws"
     state: directory
     mode: '0700'
 
 - name: Check if bws access token exists
   stat:
-    path: "{{ ansible_env.HOME }}/.config/bws/access_token"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/bws/access_token"
   register: bws_token_file
 
 - name: Fail if bws access token not found
@@ -32,7 +32,7 @@
 
 - name: Ensure .ssh directory exists
   file:
-    path: "{{ ansible_env.HOME }}/.ssh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
     state: directory
     mode: '0700'
 
@@ -40,31 +40,31 @@
   shell: |
     BWS_ACCESS_TOKEN=$(cat ~/.config/bws/access_token) bws secret get 8caa4cd3-1229-4367-9241-b24b01696bac > ~/.ssh/id_github
   args:
-    creates: "{{ ansible_env.HOME }}/.ssh/id_github"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_github"
 
 - name: Set SSH key permissions
   file:
-    path: "{{ ansible_env.HOME }}/.ssh/id_github"
+    path: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_github"
     mode: '0600'
 
 - name: Ensure .config directory exists
   file:
-    path: "{{ ansible_env.HOME }}/.config"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config"
     state: directory
     mode: '0755'
 
 - name: Download API tokens from Bitwarden Secrets Manager
   shell: |
-    BWS_ACCESS_TOKEN=$(cat ~/.config/bws/access_token) bws secret get {{ item.secret_id }}  | jq -r '.value' > {{ ansible_env.HOME }}/.config/{{ item.file }}
+    BWS_ACCESS_TOKEN=$(cat ~/.config/bws/access_token) bws secret get {{ item.secret_id }}  | jq -r '.value' > {{ ansible_facts['env']['HOME'] }}/.config/{{ item.file }}
   loop:
     - { secret_id: "e4b96e83-6499-4124-ad50-b24b01783e6b", file: "anthropic.token" }
     - { secret_id: "d5c9c08d-4c75-45bc-af5a-b24b01787068", file: "openai.token" }
   args:
-    creates: "{{ ansible_env.HOME }}/.config/{{ item.file }}"
+    creates: "{{ ansible_facts['env']['HOME'] }}/.config/{{ item.file }}"
 
 - name: Set API token file permissions
   file:
-    path: "{{ ansible_env.HOME }}/.config/{{ item }}"
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/{{ item }}"
     mode: '0600'
   loop:
     - anthropic.token

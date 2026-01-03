@@ -1,5 +1,5 @@
 ---
-- name: Configure Ubuntu base system
+- name: Configure Debian base system
   hosts: all
   become: false
   pre_tasks:
@@ -20,7 +20,7 @@
 
     - name: Download Docker's GPG key
       get_url:
-        url: https://download.docker.com/linux/ubuntu/gpg
+        url: https://download.docker.com/linux/debian/gpg
         dest: /etc/apt/keyrings/docker.asc
         mode: '0644'
       become: true
@@ -31,7 +31,7 @@
 
     - name: Add Docker repository
       apt_repository:
-        repo: "deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+        repo: "deb [arch={{ docker_arch }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable"
         state: present
         filename: docker
       become: true
@@ -56,7 +56,9 @@
           - docker-ce-cli
           - containerd.io
           - docker-buildx-plugin
+          - docker-compose-plugin
           - keychain
+          - neovim
           - nodejs
           - pipx
           - unzip
@@ -64,16 +66,8 @@
           - python3-pynvim
           - silversearcher-ag
           - universal-ctags
-          - docker-compose-plugin
           - rsync
         state: present
-      become: true
-
-    - name: Install Neovim via snap
-      community.general.snap:
-        name: nvim
-        state: present
-        classic: true
       become: true
 
     - name: Add user to docker group

@@ -135,6 +135,7 @@ let g:copilot_filetypes = {
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_insert_leave = 0
 let g:ale_use_neovim_diagnostics_api = 1
+let g:ale_linters_ignore = {'java': ['eclipselsp']}
 nmap <silent> [a <Plug>(ale_previous_wrap)
 nmap <silent> ]a <Plug>(ale_next_wrap)
 nmap <silent> [w <Plug>(ale_previous_wrap_warning)

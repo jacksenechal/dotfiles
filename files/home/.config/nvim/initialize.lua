@@ -1,3 +1,6 @@
+-- avoid E28 from plasticboy/vim-markdown conflicting with built-in Java syntax
+vim.g.java_ignore_markdown = 1
+
 -- nvim-tree settings
 ---- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1

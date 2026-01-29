@@ -30,6 +30,8 @@ fi
 
 # Set up nvm
 export NVM_DIR="$HOME/.nvm"
+# Re-enable hashing for nvm; Omarchy disables it and nvm calls hash -r.
+set -h
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 # Set up keychain

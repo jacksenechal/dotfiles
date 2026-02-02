@@ -10,6 +10,9 @@ PS1='[\u@\h \W]\$ '
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 [ -f ~/.fzf-git.sh ] && source ~/.fzf-git.sh
 
+# Fix open-tab-in-CWD issue in Gnome Console
+source /etc/profile.d/vte.sh
+
 # Set up path
 export PATH="$PATH:/home/jack/.local/bin"
 

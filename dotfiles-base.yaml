@@ -8,6 +8,8 @@
     #   tags: tumbleweed
     - role: files
       tags: files
+    - role: secrets
+      tags: secrets
     - role: python
       tags: python
     - role: services

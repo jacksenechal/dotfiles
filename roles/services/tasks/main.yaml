@@ -1,4 +1,5 @@
 - name: Enable night-mode as a user service
+  when: inventory_hostname in groups['local']
   systemd:
     name: night-mode.service
     scope: user

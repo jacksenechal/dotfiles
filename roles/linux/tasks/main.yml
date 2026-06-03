@@ -10,3 +10,8 @@
     path: "{{ ansible_facts['env']['HOME'] }}/.config"
     state: directory
     mode: '0755'
+
+- name: Enable middle-click paste in GTK/Wayland
+  ansible.builtin.command:
+    cmd: gsettings set org.gnome.desktop.interface gtk-enable-primary-paste true
+  changed_when: false

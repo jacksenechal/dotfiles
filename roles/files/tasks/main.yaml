@@ -7,9 +7,16 @@
     perms: yes
     rsync_opts:
       - '--itemize-changes'
-    # rsync_opts:
-    #   - '--ignore-existing'
 
+- name: Copy desktop-only config files into place
+  ansible.posix.synchronize:
+    src: files/desktop/
+    dest: ~/
+    recursive: yes
+    perms: yes
+    rsync_opts:
+      - '--itemize-changes'
+  when: inventory_hostname in groups['local']
 
 - name: Ensure bashrc line exists
   ansible.builtin.lineinfile:

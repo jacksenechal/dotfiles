@@ -1,0 +1,11 @@
+---
+- name: pi + browser tooling
+  hosts: all
+  become: false
+  roles:
+    - role: secrets
+      tags: secrets
+    - role: pi
+      tags: pi
+    - role: playwright_mcp
+      tags: playwright_mcp

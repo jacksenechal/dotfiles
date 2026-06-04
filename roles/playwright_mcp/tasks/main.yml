@@ -1,0 +1,77 @@
+---
+# ---------------------------------------------------------------------------
+# (A) Prepare isolated installation directory with hardened npm config
+# ---------------------------------------------------------------------------
+- name: Ensure playwright-mcp installation directory exists
+  ansible.builtin.file:
+    path: "{{ playwright_mcp_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Drop .npmrc with security hardening into playwright-mcp dir
+  ansible.builtin.copy:
+    dest: "{{ playwright_mcp_dir }}/.npmrc"
+    content: |
+      ignore-scripts=true
+      strict-ssl=true
+    mode: "0644"
+
+# Minimal package.json so npm install has a valid project root.
+# Creates-guard: skip if the file already exists (idempotent).
+- name: Initialise package.json in playwright-mcp dir
+  ansible.builtin.command:
+    argv:
+      - "{{ playwright_mcp_node_bin }}/npm"
+      - init
+      - -y
+    chdir: "{{ playwright_mcp_dir }}"
+    creates: "{{ playwright_mcp_dir }}/package.json"
+  environment:
+    PATH: "{{ playwright_mcp_node_bin }}:{{ ansible_facts['env']['PATH'] }}"
+
+# ---------------------------------------------------------------------------
+# (B) Install @playwright/mcp at the pinned version.
+#     Uses the absolute npm path under nvm v22.13.1 so nvm is not required
+#     on the PATH.  ignore-scripts is inherited from the .npmrc above — the
+#     MCP package is pure JS and needs no install scripts.
+#     Idempotency: creates points at the installed package's own package.json.
+# ---------------------------------------------------------------------------
+- name: Install @playwright/mcp {{ playwright_mcp_version }}
+  ansible.builtin.command:
+    argv:
+      - "{{ playwright_mcp_node_bin }}/npm"
+      - install
+      - "{{ playwright_mcp_package }}@{{ playwright_mcp_version }}"
+    chdir: "{{ playwright_mcp_dir }}"
+    creates: "{{ playwright_mcp_dir }}/node_modules/{{ playwright_mcp_package }}/package.json"
+  environment:
+    PATH: "{{ playwright_mcp_node_bin }}:{{ ansible_facts['env']['PATH'] }}"
+
+# ---------------------------------------------------------------------------
+# (C) Register the MCP server with Claude Code (user scope).
+#     Step 1: list registered servers — always runs, never marks changed.
+#     Step 2: add — only runs when 'playwright' is absent from the list.
+#     The absolute bin path is used because nvm is not sourced in non-
+#     interactive shells where claude itself may invoke this.
+# ---------------------------------------------------------------------------
+- name: List currently registered Claude MCP servers
+  ansible.builtin.command:
+    argv:
+      - "{{ playwright_mcp_claude_bin }}"
+      - mcp
+      - list
+  register: playwright_mcp_claude_list
+  failed_when: false
+  changed_when: false
+
+- name: Register playwright MCP server with Claude Code
+  ansible.builtin.command:
+    argv: >-
+      {{
+        [playwright_mcp_claude_bin, 'mcp', 'add', '--scope', 'user', 'playwright',
+         playwright_mcp_dir ~ '/node_modules/.bin/playwright-mcp',
+         '--']
+        + playwright_mcp_flags
+      }}
+  when: "'playwright' not in playwright_mcp_claude_list.stdout"
+  changed_when: true

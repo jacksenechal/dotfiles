@@ -1,0 +1,10 @@
+{
+  "name": "pi-extensions",
+  "private": true,
+  "dependencies": {
+    "pi-lens": "^3.8.46",
+    "pi-smart-fetch": "^0.3.9",
+    "pi-textbrowser": "^1.1.0",
+    "pi-webaio": "^0.4.0"
+  }
+}

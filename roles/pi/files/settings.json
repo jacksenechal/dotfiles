@@ -1,0 +1,13 @@
+{
+  "lastChangelogVersion": "0.78.0",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "deepseek-v4-pro",
+  "defaultThinkingLevel": "high",
+  "theme": "dark",
+  "packages": [
+    "npm:pi-lens",
+    "npm:pi-textbrowser",
+    "npm:pi-smart-fetch",
+    "npm:pi-webaio"
+  ]
+}

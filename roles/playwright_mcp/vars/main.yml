@@ -1,0 +1,25 @@
+---
+playwright_mcp_home: "{{ ansible_facts['env']['HOME'] }}"
+
+# Node version to use for installing @playwright/mcp.
+# v22.13.1 is already present on oracle via nvm.
+playwright_mcp_node_version: "22.13.1"
+playwright_mcp_node_bin: "{{ playwright_mcp_home }}/.nvm/versions/node/v{{ playwright_mcp_node_version }}/bin"
+
+# Package version pinned for reproducibility.
+playwright_mcp_package: "@playwright/mcp"
+playwright_mcp_version: "0.0.68"
+
+# Directory that holds the isolated installation.
+playwright_mcp_dir: "{{ playwright_mcp_home }}/.local/playwright-mcp"
+
+# claude binary location.
+playwright_mcp_claude_bin: "{{ playwright_mcp_home }}/.local/bin/claude"
+
+# Flags passed to playwright-mcp when registering the MCP server.
+playwright_mcp_flags:
+  - "--headless"
+  - "--browser"
+  - "chromium"
+  - "--no-sandbox"
+  - "--isolated"

@@ -1,0 +1,182 @@
+---
+# ---------------------------------------------------------------------------
+# (A) Node via existing nvm: install v25.2.1 and alias it as default
+# ---------------------------------------------------------------------------
+- name: Install node {{ pi_node_version }} via existing nvm
+  ansible.builtin.shell:
+    cmd: >
+      bash -lc 'source ~/.nvm/nvm.sh &&
+      nvm install {{ pi_node_version }} &&
+      nvm alias default {{ pi_node_version }}'
+    creates: "{{ pi_node_bin }}"
+  # 'creates' makes this a no-op once the node bin dir exists.
+
+# ---------------------------------------------------------------------------
+# (B) Install global npm packages under the pi node version.
+#     Idempotency: 'creates' points at the package dir under lib/node_modules.
+#     Global ~/.npmrc sets ignore-scripts=true; both packages are pure JS so
+#     no install scripts are needed and the policy is honoured.
+# ---------------------------------------------------------------------------
+- name: Install global npm package {{ item.name }}@{{ item.version }}
+  ansible.builtin.command:
+    argv:
+      - "{{ pi_node_bin }}/npm"
+      - install
+      - -g
+      - "{{ item.name }}@{{ item.version }}"
+    creates: "{{ pi_home }}/.nvm/versions/node/v{{ pi_node_version }}/lib/node_modules/{{ item.name }}"
+  loop: "{{ pi_global_packages }}"
+  loop_control:
+    label: "{{ item.name }}@{{ item.version }}"
+  environment:
+    PATH: "{{ pi_node_bin }}:{{ ansible_facts['env']['PATH'] }}"
+
+# ---------------------------------------------------------------------------
+# (C) PATH shims: wrapper scripts in ~/.local/bin that put the pi node bin on
+#     PATH before exec'ing the real binary. A bare symlink is NOT enough: pi's
+#     shebang is `#!/usr/bin/env node`, so invoking it from a non-interactive
+#     shell (pi-swarm, Claude's Bash tool — where nvm is not sourced) would fail
+#     with exit 127 because `node` is not on PATH. The wrapper fixes that.
+# ---------------------------------------------------------------------------
+- name: Ensure ~/.local/bin exists
+  ansible.builtin.file:
+    path: "{{ pi_home }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Install pi wrapper scripts into ~/.local/bin
+  ansible.builtin.copy:
+    dest: "{{ pi_home }}/.local/bin/{{ item }}"
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      # Managed by dotfiles roles/pi — wrapper ensures node is on PATH.
+      export PATH="{{ pi_node_bin }}:$PATH"
+      exec "{{ pi_node_bin }}/{{ item }}" "$@"
+  loop:
+    - pi
+    - pi-web-access
+
+# ---------------------------------------------------------------------------
+# (D) Deploy pi agent config files (non-secret).
+#     auth.json is intentionally excluded — it is a secret managed elsewhere.
+# ---------------------------------------------------------------------------
+- name: Ensure ~/.pi/agent/npm directory exists
+  ansible.builtin.file:
+    path: "{{ pi_home }}/.pi/agent/npm"
+    state: directory
+    mode: "0755"
+
+- name: Deploy pi agent settings.json
+  ansible.builtin.copy:
+    src: settings.json
+    dest: "{{ pi_home }}/.pi/agent/settings.json"
+    mode: "0644"
+
+- name: Deploy pi agent npm/package.json
+  ansible.builtin.copy:
+    src: npm-package.json
+    dest: "{{ pi_home }}/.pi/agent/npm/package.json"
+    mode: "0644"
+
+- name: Deploy pi agent npm/package-lock.json
+  ansible.builtin.copy:
+    src: npm-package-lock.json
+    dest: "{{ pi_home }}/.pi/agent/npm/package-lock.json"
+    mode: "0644"
+
+# ---------------------------------------------------------------------------
+# (E) Install pi npm extensions.
+#     SECURITY EXCEPTION: the global ~/.npmrc sets ignore-scripts=true.
+#     This task overrides that policy for this directory only because several
+#     extensions (sharp, playwright) include native bindings that require
+#     postinstall scripts to download or compile platform-specific binaries.
+#     The packages are pinned via the committed package-lock.json so the risk
+#     of a supply-chain substitution is limited to the lockfile itself.
+# ---------------------------------------------------------------------------
+- name: Install pi npm extensions (install scripts enabled for native deps)
+  ansible.builtin.command:
+    argv:
+      - "{{ pi_node_bin }}/npm"
+      - install
+    chdir: "{{ pi_home }}/.pi/agent/npm"
+    creates: "{{ pi_home }}/.pi/agent/npm/node_modules/.package-lock.json"
+  environment:
+    # Deliberate exception to the global ignore-scripts=true policy.
+    # sharp and playwright-core postinstall scripts download platform binaries.
+    npm_config_ignore_scripts: "false"
+    PATH: "{{ pi_node_bin }}:{{ ansible_facts['env']['PATH'] }}"
+
+# ---------------------------------------------------------------------------
+# (F) Apply pi-webaio .unref() patch.
+#     Without this patch every `pi -p` run hangs after printing because
+#     setInterval keeps the event loop alive.
+#     The regex matches the setInterval call only when it is NOT already
+#     followed by .unref(), so the task is idempotent on re-runs.
+#     Pattern:  setInterval(cleanupSessionCache, SESSION_CACHE_CLEANUP_MS)
+#     Replacement appends .unref() immediately after the closing paren.
+# ---------------------------------------------------------------------------
+- name: Apply .unref() patch to pi-webaio setInterval call
+  ansible.builtin.replace:
+    path: "{{ pi_home }}/.pi/agent/npm/node_modules/pi-webaio/index.ts"
+    regexp: '(setInterval\(cleanupSessionCache,\s*SESSION_CACHE_CLEANUP_MS\))(?!\.unref\(\))'
+    replace: '\1.unref()'
+
+# ---------------------------------------------------------------------------
+# (G) Clone agent-sandbox repo (clone-if-absent; never reset existing checkout)
+# ---------------------------------------------------------------------------
+- name: Ensure ~/workspace directory exists
+  ansible.builtin.file:
+    path: "{{ pi_home }}/workspace"
+    state: directory
+    mode: "0755"
+
+- name: Clone pi-docker-sandbox repo if absent
+  ansible.builtin.git:
+    repo: "{{ pi_agent_sandbox_repo }}"
+    dest: "{{ pi_agent_sandbox_dest }}"
+    update: no
+
+# ---------------------------------------------------------------------------
+# (H) Sandbox extension symlink: ~/.pi/agent/extensions/sandbox -> agent-sandbox
+# ---------------------------------------------------------------------------
+- name: Ensure ~/.pi/agent/extensions directory exists
+  ansible.builtin.file:
+    path: "{{ pi_home }}/.pi/agent/extensions"
+    state: directory
+    mode: "0755"
+
+- name: Symlink extensions/sandbox -> agent-sandbox repo
+  ansible.builtin.file:
+    src: "{{ pi_agent_sandbox_dest }}"
+    dest: "{{ pi_home }}/.pi/agent/extensions/sandbox"
+    state: link
+    force: yes
+
+# ---------------------------------------------------------------------------
+# (I) Build agent-sandbox Docker image (only when image is absent).
+#     Step 1: inspect — always runs, never marks changed.
+#     Step 2: build  — only runs when inspect returned non-zero (image absent).
+#     Building on the arm64 host produces the correct arch image.
+# ---------------------------------------------------------------------------
+- name: Check whether agent-sandbox Docker image exists
+  ansible.builtin.command:
+    argv:
+      - docker
+      - image
+      - inspect
+      - "{{ pi_agent_sandbox_image }}"
+  register: pi_docker_image_inspect
+  failed_when: false
+  changed_when: false
+
+- name: Build agent-sandbox Docker image
+  ansible.builtin.command:
+    argv:
+      - docker
+      - build
+      - -t
+      - "{{ pi_agent_sandbox_image }}"
+      - "{{ pi_agent_sandbox_dest }}"
+  when: pi_docker_image_inspect.rc != 0
+  changed_when: true

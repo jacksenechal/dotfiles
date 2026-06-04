@@ -1,0 +1,18 @@
+---
+pi_home: "{{ ansible_facts['env']['HOME'] }}"
+
+# Node version used to run pi and its global packages.
+pi_node_version: "25.2.1"
+pi_node_bin: "{{ pi_home }}/.nvm/versions/node/v{{ pi_node_version }}/bin"
+
+# Global npm packages installed under the pi node version.
+pi_global_packages:
+  - name: "@earendil-works/pi-coding-agent"
+    version: "0.78.0"
+  - name: "pi-web-access"
+    version: "0.10.7"
+
+# Sandbox extension
+pi_agent_sandbox_repo: "git@github.com:jacksenechal/pi-docker-sandbox.git"
+pi_agent_sandbox_dest: "{{ pi_home }}/workspace/agent-sandbox"
+pi_agent_sandbox_image: "agent-sandbox:latest"

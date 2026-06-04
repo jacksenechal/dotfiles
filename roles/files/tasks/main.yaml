@@ -1,21 +1,18 @@
 ---
-- name: Copy config files into place
-  ansible.posix.synchronize:
-    src: files/home/
-    dest: ~/
-    recursive: yes
-    perms: yes
-    rsync_opts:
-      - '--itemize-changes'
+# User config files are symlinked from the repo into ~/ (not copied), so editing
+# the live file edits the repo file directly: `git diff` always shows the truth
+# and there is no sync step. Root-owned/system files are NOT handled here (see
+# the tumbleweed role) because a root daemon reading a config in a user-writable
+# repo is a permission/security problem.
+- name: Symlink home config files into place
+  ansible.builtin.include_tasks: link_tree.yml
+  vars:
+    link_tree_src: "{{ playbook_dir }}/files/home"
 
-- name: Copy desktop-only config files into place
-  ansible.posix.synchronize:
-    src: files/desktop/
-    dest: ~/
-    recursive: yes
-    perms: yes
-    rsync_opts:
-      - '--itemize-changes'
+- name: Symlink desktop-only config files into place
+  ansible.builtin.include_tasks: link_tree.yml
+  vars:
+    link_tree_src: "{{ playbook_dir }}/files/desktop"
   when: inventory_hostname in groups['local']
 
 - name: Ensure bashrc line exists

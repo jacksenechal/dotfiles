@@ -1,0 +1,33 @@
+---
+# Symlink every file under `link_tree_src` into the home directory, preserving
+# the relative path. Per-file links (not whole-directory) keep the repo clean:
+# files an app writes alongside a tracked config (lockfiles, plugin state, swap
+# files) stay out of git. Adding a NEW tracked file requires re-running this
+# role so the link gets created.
+- name: "Find tracked files under {{ link_tree_src }}"
+  ansible.builtin.find:
+    paths: "{{ link_tree_src }}"
+    recurse: true
+    file_type: file
+    hidden: true # dotfiles and dot-directories (.config, .zshrc, ...)
+  register: link_tree_found
+
+- name: "Ensure parent directories exist for {{ link_tree_src }}"
+  ansible.builtin.file:
+    path: "{{ (ansible_facts['env']['HOME'] ~ '/' ~ (item.path | relpath(link_tree_src))) | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ link_tree_found.files }}"
+  loop_control:
+    label: "{{ item.path | relpath(link_tree_src) }}"
+
+- name: "Symlink files from {{ link_tree_src }} into home"
+  ansible.builtin.file:
+    src: "{{ item.path }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/{{ item.path | relpath(link_tree_src) }}"
+    state: link
+    force: true # replace any pre-existing regular file (migration from copy)
+    follow: false
+  loop: "{{ link_tree_found.files }}"
+  loop_control:
+    label: "{{ item.path | relpath(link_tree_src) }}"

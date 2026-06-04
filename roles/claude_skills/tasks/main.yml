@@ -1,0 +1,129 @@
+---
+# ---------------------------------------------------------------------------
+# (A) Ensure base directories exist
+# ---------------------------------------------------------------------------
+- name: Ensure required directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ claude_skills_home }}/workspace"
+    - "{{ claude_skills_home }}/workspace/skills/third-party"
+    - "{{ claude_skills_home }}/.claude"
+    - "{{ claude_skills_home }}/.claude/hooks"
+    - "{{ claude_skills_home }}/.claude/skills"
+
+# ---------------------------------------------------------------------------
+# (B) Clone skill repos (update: no — never resets existing checkouts)
+# ---------------------------------------------------------------------------
+- name: Clone skill repos if absent
+  ansible.builtin.git:
+    repo: "{{ item.repo }}"
+    dest: "{{ item.dest }}"
+    update: no
+  loop: "{{ claude_skills_repos }}"
+  loop_control:
+    label: "{{ item.dest }}"
+
+# ---------------------------------------------------------------------------
+# (C) Convenience symlink: ~/workspace/skills/published -> agent-tools/skills
+# ---------------------------------------------------------------------------
+- name: Symlink skills/published -> agent-tools/skills
+  ansible.builtin.file:
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills"
+    dest: "{{ claude_skills_home }}/workspace/skills/published"
+    state: link
+    force: yes
+
+# ---------------------------------------------------------------------------
+# (D) Claude skill symlinks: ~/.claude/skills/<name> -> <src>
+# ---------------------------------------------------------------------------
+- name: Symlink Claude skills into ~/.claude/skills/
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ claude_skills_home }}/.claude/skills/{{ item.name }}"
+    state: link
+    force: yes
+  loop: "{{ claude_skills_skill_links }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+# ---------------------------------------------------------------------------
+# (E) Deploy global Claude config docs
+# ---------------------------------------------------------------------------
+- name: Deploy CLAUDE.md
+  ansible.builtin.copy:
+    src: CLAUDE.md
+    dest: "{{ claude_skills_home }}/.claude/CLAUDE.md"
+    mode: "0644"
+
+- name: Deploy security-requirements.md
+  ansible.builtin.copy:
+    src: security-requirements.md
+    dest: "{{ claude_skills_home }}/.claude/security-requirements.md"
+    mode: "0644"
+
+- name: Deploy block-shai-hulud hook
+  ansible.builtin.copy:
+    src: block-shai-hulud.sh
+    dest: "{{ claude_skills_home }}/.claude/hooks/block-shai-hulud.sh"
+    mode: "0755"
+
+# ---------------------------------------------------------------------------
+# (F) Register shai-hulud hook in ~/.claude/settings.json without owning
+#     the whole file. Strategy:
+#       1. slurp existing file (base64) or default to empty object.
+#       2. Parse JSON, extract existing PreToolUse list (default []).
+#       3. Test whether an entry matching our hook command already exists.
+#       4. If absent, append our entry and write back (idempotent on second
+#          run because the entry will be found and no write occurs).
+# ---------------------------------------------------------------------------
+- name: Read ~/.claude/settings.json if it exists
+  ansible.builtin.slurp:
+    src: "{{ claude_skills_home }}/.claude/settings.json"
+  register: claude_skills_settings_raw
+  ignore_errors: yes
+
+- name: Parse existing settings (default to empty object if absent)
+  ansible.builtin.set_fact:
+    claude_skills_settings: >-
+      {{
+        (claude_skills_settings_raw.content | default('e30K') | b64decode | from_json)
+        if claude_skills_settings_raw is not failed
+        else {}
+      }}
+
+- name: Check whether shai-hulud hook entry is already registered
+  ansible.builtin.set_fact:
+    claude_skills_hook_present: >-
+      {{
+        (claude_skills_settings.get('hooks', {}).get('PreToolUse', [])
+         | selectattr('hooks', 'defined')
+         | map(attribute='hooks')
+         | flatten
+         | selectattr('command', 'defined')
+         | selectattr('command', 'equalto', claude_skills_hook_entry.hooks[0].command)
+         | list
+         | length) > 0
+      }}
+
+- name: Merge shai-hulud hook entry into settings.json
+  ansible.builtin.copy:
+    dest: "{{ claude_skills_home }}/.claude/settings.json"
+    content: >-
+      {{
+        claude_skills_settings
+        | combine({
+            'hooks': (claude_skills_settings.get('hooks', {}))
+            | combine({
+                'PreToolUse': (
+                  claude_skills_settings.get('hooks', {}).get('PreToolUse', [])
+                  + [claude_skills_hook_entry]
+                )
+              })
+          })
+        | to_nice_json
+      }}
+    mode: "0644"
+  when: not claude_skills_hook_present

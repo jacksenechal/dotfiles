@@ -1,0 +1,58 @@
+---
+claude_skills_home: "{{ ansible_facts['env']['HOME'] }}"
+
+claude_skills_repos:
+  - repo: git@github.com:jacksenechal/agent-tools.git
+    dest: "{{ claude_skills_home }}/workspace/agent-tools"
+  - repo: git@github.com:jacksenechal/agent-tools-private.git
+    dest: "{{ claude_skills_home }}/workspace/skills/local"
+  - repo: git@github.com:anthropics/skills.git
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/anthropics-skills"
+  - repo: https://github.com/davila7/claude-code-templates
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/davila7-claude-code-templates"
+  - repo: https://github.com/softaworks/agent-toolkit
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/softaworks-agent-toolkit"
+  - repo: git@github.com:obra/superpowers.git
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/superpowers"
+  - repo: https://github.com/vercel-labs/skills
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills"
+
+# Each entry maps ~/.claude/skills/<name> -> <src>.
+# playwright-docker is deliberately excluded: it must not be symlinked on servers.
+claude_skills_skill_links:
+  - name: add-homebox-app
+    src: "{{ claude_skills_home }}/workspace/skills/local/add-homebox-app"
+  - name: architecture
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/davila7-claude-code-templates/cli-tool/components/skills/development/architecture"
+  - name: blaze
+    src: "{{ claude_skills_home }}/workspace/skills/local/blaze"
+  - name: claude-api
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/anthropics-skills/skills/claude-api"
+  - name: claude-code-guide
+    src: "{{ claude_skills_home }}/workspace/skills/local/claude-code-guide"
+  - name: find-skills
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills/skills/find-skills"
+  - name: job-search
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/job-search"
+  - name: pi-swarm
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/pi-swarm"
+  - name: repo-scout
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/repo-scout"
+  - name: semi-formal-code-reasoning
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/semi-formal-code-reasoning"
+  - name: skill-creator
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/anthropics-skills/skills/skill-creator"
+  - name: skill-judge
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/softaworks-agent-toolkit/skills/skill-judge"
+  - name: skill-review
+    src: "{{ claude_skills_home }}/workspace/skills/local/skill-review"
+  - name: skill-security-auditor
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/skill-security-auditor"
+  - name: sync-claude-config
+    src: "{{ claude_skills_home }}/workspace/skills/local/sync-claude-config"
+
+claude_skills_hook_entry:
+  matcher: "*"
+  hooks:
+    - type: command
+      command: "~/.claude/hooks/block-shai-hulud.sh"

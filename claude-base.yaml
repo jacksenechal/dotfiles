@@ -1,0 +1,7 @@
+---
+- name: Claude Code config + skills
+  hosts: all
+  become: false
+  roles:
+    - role: claude_skills
+      tags: claude_skills

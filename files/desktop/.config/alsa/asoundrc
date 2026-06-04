@@ -1,0 +1,13 @@
+# Custom ALSA PCM that bridges to the PipeWire echo-cancellation source.
+# PipeWire node names are not visible to ALSA/cpal directly, so apps like
+# voxtype (which enumerate ALSA PCMs) cannot select "Echo_Cancellation_Source"
+# by its PipeWire node name. This defines an ALSA PCM that targets that node.
+pcm.echocancel {
+    type pipewire
+    capture_node "Echo_Cancellation_Source"
+    playback_node "Echo_Cancellation_Sink"
+    hint {
+        show on
+        description "Echo Cancellation Source (PipeWire)"
+    }
+}

@@ -1,0 +1,4 @@
+---
+# Expose noVNC on oracle's Tailscale IP (in addition to localhost) so the
+# tailnet can watch headed Playwright runs without an SSH tunnel.
+novnc_tailscale_ip: "100.101.19.79"

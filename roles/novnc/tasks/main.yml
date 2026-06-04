@@ -40,6 +40,17 @@
     - novnc
   notify: Reload systemd
 
+# Optional extra websockify listener on a per-host address (e.g. Tailscale IP),
+# in addition to the localhost one above. Only when novnc_tailscale_ip is set.
+- name: Template tailscale noVNC websockify unit
+  become: true
+  ansible.builtin.template:
+    src: novnc-tailscale.service.j2
+    dest: /etc/systemd/system/novnc-tailscale.service
+    mode: "0644"
+  when: novnc_tailscale_ip | default('') | length > 0
+  notify: Reload systemd
+
 # Ensure daemon-reload happens before we (re)start the services below.
 - name: Flush handlers so daemon-reload runs before service start
   ansible.builtin.meta: flush_handlers
@@ -60,6 +71,15 @@
     - fluxbox
     - x11vnc
     - novnc
+
+- name: Enable and start tailscale noVNC websockify
+  become: true
+  ansible.builtin.systemd:
+    name: novnc-tailscale
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: novnc_tailscale_ip | default('') | length > 0
 
 # ---------------------------------------------------------------------------
 # (D) Register a SECOND, HEADED MCP server with Claude Code (user scope),

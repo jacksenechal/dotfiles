@@ -1,0 +1,7 @@
+---
+# Optional extra address to expose the noVNC websockify bridge on, in addition
+# to the always-present localhost listener. Set per-host (e.g. host_vars) to a
+# Tailscale IP so the tailnet can reach noVNC without an SSH tunnel. Empty =
+# localhost-only. Never set this to 0.0.0.0 — x11vnc runs with -nopw, so the
+# bridge must only face trusted networks (loopback / tailnet).
+novnc_tailscale_ip: ""

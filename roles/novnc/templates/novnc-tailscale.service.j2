@@ -1,0 +1,16 @@
+[Unit]
+Description=noVNC websockify bridge (tailscale {{ novnc_tailscale_ip }}:{{ novnc_web_port }} -> VNC {{ novnc_vnc_port }})
+Requires=x11vnc.service
+After=x11vnc.service network-online.target snap.tailscale.tailscaled.service
+Wants=network-online.target
+
+[Service]
+User={{ novnc_user }}
+# Binds the tailnet IP. Restart=always + RestartSec covers the case where the
+# tailscale interface/IP isn't available yet at boot.
+ExecStart=/usr/bin/websockify --web {{ novnc_web_root }} {{ novnc_tailscale_ip }}:{{ novnc_web_port }} localhost:{{ novnc_vnc_port }}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

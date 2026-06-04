@@ -1,0 +1,30 @@
+---
+# Virtual X display + geometry that Xvfb, fluxbox, x11vnc and the headed
+# browser all share.
+novnc_display: ":99"
+novnc_geometry: "1920x1080"
+
+# Ports (both bound to localhost only — we view through an SSH tunnel).
+novnc_vnc_port: 5900
+novnc_web_port: 6080
+
+# Where the noVNC web assets (vnc.html etc.) live. The Ubuntu 'novnc'
+# package installs them under /usr/share/novnc.
+novnc_web_root: "/usr/share/novnc"
+
+# System user the X stack + browser run as.
+novnc_user: "{{ ansible_facts['env']['USER'] | default('ubuntu') }}"
+
+# playwright-mcp bin (installed by the playwright_mcp role).
+novnc_playwright_bin: "{{ ansible_facts['env']['HOME'] }}/.local/playwright-mcp/node_modules/.bin/playwright-mcp"
+
+# claude binary location.
+novnc_claude_bin: "{{ ansible_facts['env']['HOME'] }}/.local/bin/claude"
+
+# Flags for the HEADED MCP server — deliberately NO --headless so the
+# browser renders into the Xvfb display we can watch over noVNC.
+novnc_headed_flags:
+  - "--browser"
+  - "chromium"
+  - "--no-sandbox"
+  - "--isolated"

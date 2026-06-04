@@ -1,0 +1,13 @@
+[Unit]
+Description=Fluxbox window manager on {{ novnc_display }}
+Requires=xvfb.service
+After=xvfb.service
+
+[Service]
+User={{ novnc_user }}
+Environment=DISPLAY={{ novnc_display }}
+ExecStart=/usr/bin/fluxbox
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,96 @@
+---
+# ---------------------------------------------------------------------------
+# (A) Install the X / VNC / noVNC stack.
+#     xvfb       - headless X server (virtual framebuffer)
+#     x11vnc     - exports that X display over VNC
+#     novnc      - browser-based VNC client web assets (vnc.html)
+#     websockify - bridges noVNC's websocket to the VNC TCP port
+#     fluxbox    - lightweight window manager so windows have decorations
+#     dbus-x11   - dbus-launch, needed by chromium under X
+#     x11-utils  - provides xdpyinfo for verification
+# ---------------------------------------------------------------------------
+- name: Install Xvfb + VNC + noVNC packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - xvfb
+      - x11vnc
+      - novnc
+      - websockify
+      - fluxbox
+      - dbus-x11
+      - x11-utils
+    state: present
+    update_cache: true
+
+# ---------------------------------------------------------------------------
+# (B) Template the four systemd SYSTEM unit files. A change to any unit
+#     notifies the "Reload systemd" handler (systemctl daemon-reload).
+# ---------------------------------------------------------------------------
+- name: Template systemd unit files
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+    mode: "0644"
+  loop:
+    - xvfb
+    - fluxbox
+    - x11vnc
+    - novnc
+  notify: Reload systemd
+
+# Ensure daemon-reload happens before we (re)start the services below.
+- name: Flush handlers so daemon-reload runs before service start
+  ansible.builtin.meta: flush_handlers
+
+# ---------------------------------------------------------------------------
+# (C) Enable + start all four services. Order respects the unit dependencies
+#     (xvfb -> fluxbox/x11vnc -> novnc) but systemd handles ordering anyway.
+# ---------------------------------------------------------------------------
+- name: Enable and start novnc stack services
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop:
+    - xvfb
+    - fluxbox
+    - x11vnc
+    - novnc
+
+# ---------------------------------------------------------------------------
+# (D) Register a SECOND, HEADED MCP server with Claude Code (user scope),
+#     running as the user (no become). The existing headless 'playwright'
+#     server is left untouched. DISPLAY is injected so the browser renders
+#     into our Xvfb display.
+#       Step 1: list servers — always runs, never marks changed.
+#       Step 2: add — only when 'playwright-headed' is absent.
+# ---------------------------------------------------------------------------
+- name: List currently registered Claude MCP servers
+  ansible.builtin.command:
+    argv:
+      - "{{ novnc_claude_bin }}"
+      - mcp
+      - list
+  register: novnc_claude_list
+  failed_when: false
+  changed_when: false
+
+# NOTE: claude's `-e/--env` is variadic, so it must come AFTER the positional
+# name + command (otherwise it greedily swallows the server name). The trailing
+# `-- <flags>` are passed through to playwright-mcp as subprocess args.
+- name: Register headed playwright MCP server with Claude Code
+  ansible.builtin.command:
+    argv: >-
+      {{
+        [novnc_claude_bin, 'mcp', 'add', '--scope', 'user',
+         'playwright-headed', novnc_playwright_bin,
+         '-e', 'DISPLAY=' ~ novnc_display,
+         '--']
+        + novnc_headed_flags
+      }}
+  when: "'playwright-headed' not in novnc_claude_list.stdout"
+  changed_when: true

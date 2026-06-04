@@ -1,0 +1,7 @@
+---
+- name: noVNC headed Playwright viewer
+  hosts: all
+  become: false
+  roles:
+    - role: novnc
+      tags: novnc

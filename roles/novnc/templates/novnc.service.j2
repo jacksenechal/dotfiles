@@ -1,0 +1,12 @@
+[Unit]
+Description=noVNC websockify bridge (localhost:{{ novnc_web_port }} -> VNC {{ novnc_vnc_port }})
+Requires=x11vnc.service
+After=x11vnc.service
+
+[Service]
+User={{ novnc_user }}
+ExecStart=/usr/bin/websockify --web {{ novnc_web_root }} 127.0.0.1:{{ novnc_web_port }} localhost:{{ novnc_vnc_port }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

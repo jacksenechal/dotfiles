@@ -1,0 +1,12 @@
+[Unit]
+Description=x11vnc server exporting {{ novnc_display }} on localhost:{{ novnc_vnc_port }}
+Requires=xvfb.service
+After=xvfb.service
+
+[Service]
+User={{ novnc_user }}
+ExecStart=/usr/bin/x11vnc -display {{ novnc_display }} -forever -shared -localhost -rfbport {{ novnc_vnc_port }} -nopw
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

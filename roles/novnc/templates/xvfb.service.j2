@@ -1,0 +1,11 @@
+[Unit]
+Description=Xvfb virtual framebuffer X server (display {{ novnc_display }})
+After=network.target
+
+[Service]
+User={{ novnc_user }}
+ExecStart=/usr/bin/Xvfb {{ novnc_display }} -screen 0 {{ novnc_geometry }}x24 -ac
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

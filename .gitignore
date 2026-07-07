@@ -1,3 +1,5 @@
 tags
 tags.lock
-.claude
+# Anchor to repo root so this ignores a stray Claude Code session dir at the
+# top level WITHOUT swallowing the tracked files/home/.claude config tree.
+/.claude

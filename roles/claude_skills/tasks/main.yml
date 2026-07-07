@@ -50,25 +50,36 @@
     label: "{{ item.name }}"
 
 # ---------------------------------------------------------------------------
-# (E) Deploy global Claude config docs
+# (E) Symlink global Claude config docs from the dotfiles repo.
+#     These are SYMLINKED (not copied) so editing the live file edits the repo
+#     file directly: `git diff` shows the truth and re-applying this role can
+#     never clobber local edits (the copy-based approach did). The canonical
+#     sources live under files/home/.claude/ and are also picked up by the
+#     `files` role on hosts where that role's link_tree runs.
+#     The src is HOME-relative (not {{ playbook_dir }}) so the link resolves
+#     on every host regardless of its home dir; it requires the dotfiles repo
+#     checked out at ~/workspace/dotfiles (kept current by sync-claude-config).
 # ---------------------------------------------------------------------------
-- name: Deploy CLAUDE.md
-  ansible.builtin.copy:
-    src: CLAUDE.md
+- name: Symlink CLAUDE.md from the dotfiles repo
+  ansible.builtin.file:
+    src: "{{ claude_skills_home }}/workspace/dotfiles/files/home/.claude/CLAUDE.md"
     dest: "{{ claude_skills_home }}/.claude/CLAUDE.md"
-    mode: "0644"
+    state: link
+    force: yes
 
-- name: Deploy security-requirements.md
-  ansible.builtin.copy:
-    src: security-requirements.md
+- name: Symlink security-requirements.md from the dotfiles repo
+  ansible.builtin.file:
+    src: "{{ claude_skills_home }}/workspace/dotfiles/files/home/.claude/security-requirements.md"
     dest: "{{ claude_skills_home }}/.claude/security-requirements.md"
-    mode: "0644"
+    state: link
+    force: yes
 
-- name: Deploy block-shai-hulud hook
-  ansible.builtin.copy:
-    src: block-shai-hulud.sh
+- name: Symlink block-shai-hulud hook from the dotfiles repo
+  ansible.builtin.file:
+    src: "{{ claude_skills_home }}/workspace/dotfiles/files/home/.claude/hooks/block-shai-hulud.sh"
     dest: "{{ claude_skills_home }}/.claude/hooks/block-shai-hulud.sh"
-    mode: "0755"
+    state: link
+    force: yes
 
 # ---------------------------------------------------------------------------
 # (F) Register shai-hulud hook in ~/.claude/settings.json without owning

@@ -2,3 +2,5 @@ tags
 tags.*
 .vscode
 .aider*
+
+**/.claude/settings.local.json

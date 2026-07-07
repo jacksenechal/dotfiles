@@ -138,3 +138,36 @@
       }}
     mode: "0644"
   when: not claude_skills_hook_present
+
+# ---------------------------------------------------------------------------
+# (G) Enforce managed top-level settings.json keys (idempotent, non-owning).
+#     Same philosophy as the hook merge: settings.json stays host-managed so
+#     Claude Code can keep writing volatile keys (theme, model, ...) to it —
+#     we only guarantee the keys in claude_skills_settings_defaults hold their
+#     managed value. Re-slurp first because the hook task above may have just
+#     rewritten the file. Shallow combine overlays only these keys and writes
+#     only when something would actually change (so it is churn-free).
+# ---------------------------------------------------------------------------
+- name: Re-read settings.json before enforcing managed defaults
+  ansible.builtin.slurp:
+    src: "{{ claude_skills_home }}/.claude/settings.json"
+  register: claude_skills_settings_raw2
+  ignore_errors: yes
+
+- name: Parse settings for managed-defaults merge
+  ansible.builtin.set_fact:
+    claude_skills_settings2: >-
+      {{
+        (claude_skills_settings_raw2.content | default('e30K') | b64decode | from_json)
+        if claude_skills_settings_raw2 is not failed
+        else {}
+      }}
+
+- name: Enforce managed default keys in settings.json
+  ansible.builtin.copy:
+    dest: "{{ claude_skills_home }}/.claude/settings.json"
+    content: "{{ claude_skills_settings2 | combine(claude_skills_settings_defaults) | to_nice_json }}"
+    mode: "0644"
+  when: >-
+    (claude_skills_settings2 | combine(claude_skills_settings_defaults))
+    != claude_skills_settings2

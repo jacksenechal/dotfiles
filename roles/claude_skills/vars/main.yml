@@ -56,3 +56,9 @@ claude_skills_hook_entry:
   hooks:
     - type: command
       command: "~/.claude/hooks/block-shai-hulud.sh"
+
+# Top-level settings.json keys this role keeps at a managed value. Merged in
+# without owning the file (settings.json stays host-managed for volatile keys
+# like theme/model). Add scalar keys here to standardize them across hosts.
+claude_skills_settings_defaults:
+  teammateMode: auto

@@ -7,5 +7,9 @@
       tags: secrets
     - role: pi
       tags: pi
+    # Bare-metal playwright MCP is server-side tooling. Local uses the
+    # docker-based playwright setup (LOCAL-ONLY), so localhost disables
+    # this role via host_vars.
     - role: playwright_mcp
       tags: playwright_mcp
+      when: playwright_mcp_enabled | default(true)

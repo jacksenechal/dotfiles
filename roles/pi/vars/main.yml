@@ -6,9 +6,12 @@ pi_node_version: "25.2.1"
 pi_node_bin: "{{ pi_home }}/.nvm/versions/node/v{{ pi_node_version }}/bin"
 
 # Global npm packages installed under the pi node version.
+# Pins are auto-bumped by the sync-claude-config skill to the newest version
+# published >= 14 days ago (supply-chain min-age policy). Never pin a version
+# younger than 14 days.
 pi_global_packages:
   - name: "@earendil-works/pi-coding-agent"
-    version: "0.78.0"
+    version: "0.79.10"
   - name: "pi-web-access"
     version: "0.10.7"
 

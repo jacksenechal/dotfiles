@@ -1,0 +1,6 @@
+---
+# Local browser tooling is the docker-based playwright setup (playwright-docker
+# skill, SSE servers on localhost:3080/3081). The bare-metal playwright MCP that
+# the playwright_mcp role installs is for servers (oracle); it also pins a node
+# version (22.13.1) that only exists on oracle, so it must not run here.
+playwright_mcp_enabled: false

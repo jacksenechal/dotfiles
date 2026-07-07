@@ -13,18 +13,21 @@
 
 # ---------------------------------------------------------------------------
 # (B) Install global npm packages under the pi node version.
-#     Idempotency: 'creates' points at the package dir under lib/node_modules.
+#     Version-enforcing: compares the installed package.json version against
+#     the pin and (re)installs on mismatch, so pin bumps propagate on re-runs.
 #     Global ~/.npmrc sets ignore-scripts=true; both packages are pure JS so
 #     no install scripts are needed and the policy is honoured.
 # ---------------------------------------------------------------------------
 - name: Install global npm package {{ item.name }}@{{ item.version }}
-  ansible.builtin.command:
-    argv:
-      - "{{ pi_node_bin }}/npm"
-      - install
-      - -g
-      - "{{ item.name }}@{{ item.version }}"
-    creates: "{{ pi_home }}/.nvm/versions/node/v{{ pi_node_version }}/lib/node_modules/{{ item.name }}"
+  ansible.builtin.shell:
+    cmd: >
+      installed="$({{ pi_node_bin }}/node -p
+      "require('{{ pi_home }}/.nvm/versions/node/v{{ pi_node_version }}/lib/node_modules/{{ item.name }}/package.json').version"
+      2>/dev/null || true)";
+      if [ "$installed" = "{{ item.version }}" ]; then echo PI_PKG_UNCHANGED;
+      else {{ pi_node_bin }}/npm install -g "{{ item.name }}@{{ item.version }}"; fi
+  register: pi_global_install
+  changed_when: "'PI_PKG_UNCHANGED' not in pi_global_install.stdout"
   loop: "{{ pi_global_packages }}"
   loop_control:
     label: "{{ item.name }}@{{ item.version }}"
@@ -78,15 +81,20 @@
     src: npm-package.json
     dest: "{{ pi_home }}/.pi/agent/npm/package.json"
     mode: "0644"
+  register: pi_ext_manifest
 
 - name: Deploy pi agent npm/package-lock.json
   ansible.builtin.copy:
     src: npm-package-lock.json
     dest: "{{ pi_home }}/.pi/agent/npm/package-lock.json"
     mode: "0644"
+  register: pi_ext_lock
 
 # ---------------------------------------------------------------------------
 # (E) Install pi npm extensions.
+#     Runs `npm ci` (clean, lockfile-exact install) whenever the deployed
+#     manifest or lockfile changed, or when no extension tree exists yet, so
+#     pin bumps in the committed files propagate on re-runs.
 #     SECURITY EXCEPTION: the global ~/.npmrc sets ignore-scripts=true.
 #     This task overrides that policy for this directory only because several
 #     extensions (sharp, playwright) include native bindings that require
@@ -94,33 +102,23 @@
 #     The packages are pinned via the committed package-lock.json so the risk
 #     of a supply-chain substitution is limited to the lockfile itself.
 # ---------------------------------------------------------------------------
+- name: Check for installed pi extension tree
+  ansible.builtin.stat:
+    path: "{{ pi_home }}/.pi/agent/npm/node_modules/.package-lock.json"
+  register: pi_ext_installed
+
 - name: Install pi npm extensions (install scripts enabled for native deps)
   ansible.builtin.command:
     argv:
       - "{{ pi_node_bin }}/npm"
-      - install
+      - ci
     chdir: "{{ pi_home }}/.pi/agent/npm"
-    creates: "{{ pi_home }}/.pi/agent/npm/node_modules/.package-lock.json"
+  when: pi_ext_manifest.changed or pi_ext_lock.changed or not pi_ext_installed.stat.exists
   environment:
     # Deliberate exception to the global ignore-scripts=true policy.
     # sharp and playwright-core postinstall scripts download platform binaries.
     npm_config_ignore_scripts: "false"
     PATH: "{{ pi_node_bin }}:{{ ansible_facts['env']['PATH'] }}"
-
-# ---------------------------------------------------------------------------
-# (F) Apply pi-webaio .unref() patch.
-#     Without this patch every `pi -p` run hangs after printing because
-#     setInterval keeps the event loop alive.
-#     The regex matches the setInterval call only when it is NOT already
-#     followed by .unref(), so the task is idempotent on re-runs.
-#     Pattern:  setInterval(cleanupSessionCache, SESSION_CACHE_CLEANUP_MS)
-#     Replacement appends .unref() immediately after the closing paren.
-# ---------------------------------------------------------------------------
-- name: Apply .unref() patch to pi-webaio setInterval call
-  ansible.builtin.replace:
-    path: "{{ pi_home }}/.pi/agent/npm/node_modules/pi-webaio/index.ts"
-    regexp: '(setInterval\(cleanupSessionCache,\s*SESSION_CACHE_CLEANUP_MS\))(?!\.unref\(\))'
-    replace: '\1.unref()'
 
 # ---------------------------------------------------------------------------
 # (G) Clone agent-sandbox repo (clone-if-absent; never reset existing checkout)

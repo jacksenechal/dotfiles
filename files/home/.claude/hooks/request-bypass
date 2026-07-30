@@ -1,0 +1,15 @@
+#!/bin/bash
+# Grant a time-limited bypass of block-shai-hulud.sh's config-write protection.
+# Usage: request-bypass [minutes]   (default 30, max 120)
+set -euo pipefail
+
+MINUTES="${1:-30}"
+case "$MINUTES" in ''|*[!0-9]*) echo "usage: request-bypass [minutes]" >&2; exit 1 ;; esac
+[ "$MINUTES" -ge 1 ] || { echo "minutes must be >= 1" >&2; exit 1; }
+[ "$MINUTES" -le 120 ] || { echo "max 120 minutes" >&2; exit 1; }
+
+BYPASS="$HOME/.claude/hooks/.bypass"
+date -d "+$MINUTES min" +%s > "$BYPASS"
+chmod 600 "$BYPASS"
+echo "Config-write protection bypassed until $(date -d "@$(cat "$BYPASS")" '+%H:%M:%S') (${MINUTES}m)."
+echo "Revoke early with: rm -f $BYPASS"

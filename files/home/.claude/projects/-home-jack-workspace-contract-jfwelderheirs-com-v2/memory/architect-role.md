@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-04T17:33:07.672Z
+  modified: 2026-08-04T17:44:45.524Z
 ---
 
 # The Architect (living document)
@@ -97,6 +97,10 @@ Lead shares this project directory and this memory. On assignment:
 5. Deliver Jack a state-of-the-project TL;DR before taking new work.
 
 ## Evolution log (one line each, newest first)
+- 2026-08-04 (later still): this memory dir now physically lives in the dotfiles repo
+  (symlinked, hooks-style; placed by the claude_skills ansible role) so it syncs to
+  Jack's other machines. **After editing any memory here, commit in
+  ~/workspace/dotfiles** — an uncommitted evolution doesn't travel.
 - 2026-08-04 (later): Team Lead caught me recording ADR-009 as Accepted before Jack's
   UX pass — off-by-one on his numbered reply. Added the relay-binding tenet above.
 - 2026-08-04: Seeded from the budget-crisis retrospective + overnight scoping session

@@ -35,6 +35,8 @@ alias kctx='kubectl config use-context $(kubectl config get-contexts -o name | f
 alias kns='kubectl config set-context --current --namespace=$(kubectl get ns -o name | sed "s~^.*/~~" | fzf)'
 alias ll='ls -al --color=auto'
 alias ls='ls --color=auto'
+# per-program RAM roll-up (ps_mem needs root for other users, so scope to mine)
+alias psm='ps_mem -p $(pgrep -d, -u "$USER")'
 alias xc='xclip -selection clipboard'
 alias xp='xclip -selection clipboard -o'
 # alias z=zypper

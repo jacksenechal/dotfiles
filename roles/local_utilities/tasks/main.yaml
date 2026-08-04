@@ -5,6 +5,16 @@
     state: directory
     mode: '0755'
 
+# Per-program RAM roll-up (unlike htop/btop, sums a program's processes and
+# handles shared memory correctly). Single stdlib-only script, no deps.
+# Pinned to a tag + checksum rather than tracking master.
+- name: Install ps_mem
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/pixelb/ps_mem/v3.14/ps_mem.py
+    dest: "~/.local/bin/ps_mem"
+    checksum: sha256:60c876594e70eecc0deffb22fe758bbb1e7a5aab4e278c1f20a2d187696ef6b7
+    mode: '0755'
+
 # - name: Download and extract stern
 #   ansible.builtin.unarchive:
 #     src: https://github.com/stern/stern/releases/download/v1.31.0/stern_1.31.0_linux_amd64.tar.gz

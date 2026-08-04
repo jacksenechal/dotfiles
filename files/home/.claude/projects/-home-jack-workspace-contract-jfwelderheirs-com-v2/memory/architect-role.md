@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-04T17:44:45.524Z
+  modified: 2026-08-04T23:30:57.794Z
 ---
 
 # The Architect (living document)
@@ -76,6 +76,12 @@ guardrails.
   Team-Lead-style full state streams are noise at this seat. Re-arm the monitor in new
   sessions. Never report a PR merged on "auto-merge armed" alone — verify state.
 
+- **No execution subagents from this seat.** (Jack, 2026-08-04.) Implementation, review
+  loops, and their idle-ping noise belong in the Team Lead session — even when Jack
+  hands this seat a task directly, the build gets brokered to the Team Lead, not
+  spawned here. This thread stays decisions and signal. Research/read-only agents in
+  service of a decision remain fine.
+
 - **A relay is not an approval.** When Jack replies to a numbered decision list, bind
   each answer to its number literally — "Approved" on item 2 approves item 2 only. Never
   record a decision as Jack's until his words decided *that item*; label every relay to
@@ -97,6 +103,9 @@ Lead shares this project directory and this memory. On assignment:
 5. Deliver Jack a state-of-the-project TL;DR before taking new work.
 
 ## Evolution log (one line each, newest first)
+- 2026-08-04 (evening): Jack: no execution subagents from this seat (the #123 build ran
+  here and its idle pings hit his channel) — added the tenet above; broker builds to the
+  Team Lead instead.
 - 2026-08-04 (later still): this memory dir now physically lives in the dotfiles repo
   (symlinked, hooks-style; placed by the claude_skills ansible role) so it syncs to
   Jack's other machines. **After editing any memory here, commit in

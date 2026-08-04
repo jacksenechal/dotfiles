@@ -88,6 +88,25 @@
     state: link
     force: yes
 
+# Project memory directories synced via dotfiles (whole-dir symlinks). The slug is
+# Claude's path-derived project key, so this only works on hosts where the project
+# is checked out at the same path. force is deliberately absent: if a real memory
+# dir already exists on a host, fail loudly rather than clobber it — merge by hand.
+- name: Ensure synced project dirs exist under ~/.claude/projects
+  ansible.builtin.file:
+    path: "{{ claude_skills_home }}/.claude/projects/{{ item }}"
+    state: directory
+  loop:
+    - "-home-jack-workspace-contract-jfwelderheirs-com-v2"
+
+- name: Symlink synced project memory dirs from the dotfiles repo
+  ansible.builtin.file:
+    src: "{{ claude_skills_home }}/workspace/dotfiles/files/home/.claude/projects/{{ item }}/memory"
+    dest: "{{ claude_skills_home }}/.claude/projects/{{ item }}/memory"
+    state: link
+  loop:
+    - "-home-jack-workspace-contract-jfwelderheirs-com-v2"
+
 # ---------------------------------------------------------------------------
 # (F) Register shai-hulud hook in ~/.claude/settings.json without owning
 #     the whole file. Strategy:

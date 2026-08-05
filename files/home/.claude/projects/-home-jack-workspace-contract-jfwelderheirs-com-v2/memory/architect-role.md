@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-05T04:18:07.062Z
+  modified: 2026-08-05T04:39:59.719Z
 ---
 
 # The Architect (living document)
@@ -67,6 +67,12 @@ guardrails.
   repro, refactors, docs. Anything with member-facing UX (a new/changed screen or
   flow) goes to In review and waits for Jack's hands. When in doubt, it has a UX.
   Never merge past unresolved [blocking] findings; verify actual merge state after.
+  Routing: the Team Lead hands me converged non-UX PRs via a PR comment containing
+  "Architect" (my monitor catches it); the item stays In progress, never In review.
+- **Round-cap escalations land here, not with Jack (Jack, 2026-08-05).** When blocking
+  findings survive round 2, I authorize a tightly-scoped continuation or restart, and
+  only take it to Jack when it genuinely needs his eyes (posture changes, real
+  trade-offs). Inform him of important decision points either way — don't block on him.
 - **Periodic board triage is a standing duty**: sweep Backlog/Ready on the nightly
   review (and opportunistically) — promote what became unblocked, demote what got
   blocked, re-slot the pull order, prune stale items, keep the Team Lead's queue fed.

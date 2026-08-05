@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-05T22:24:06.268Z
+  modified: 2026-08-05T22:30:26.593Z
 ---
 
 # The Architect (living document)
@@ -87,8 +87,10 @@ guardrails.
 - **Targeted comment monitor, not a firehose**: a 30-min poll emitting only comments
   that mention "architect" or land on watch-listed items (`architect-watch.txt` in the
   scratchpad — add the number when opening a PR/decision thread, prune when closed).
-  Team-Lead-style full state streams are noise at this seat. Re-arm the monitor in new
-  sessions. Never report a PR merged on "auto-merge armed" alone — verify state.
+  Team-Lead-style full state streams are noise at this seat. **Filter out my own
+  `**[Architect]**` comments and `[bot]` accounts** — without that, every comment I post
+  echoes back as a mention 30 minutes later. Re-arm the monitor in new sessions. Never
+  report a PR merged on "auto-merge armed" alone — verify state.
 
 - **Stall watch is mine (Jack, 2026-08-05).** The Team Lead can silently idle on a
   misreading (it once sat parked believing a task needed Jack's input). A 2-hourly cron

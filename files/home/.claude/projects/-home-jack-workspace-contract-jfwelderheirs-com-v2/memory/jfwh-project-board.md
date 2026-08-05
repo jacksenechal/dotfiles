@@ -5,6 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 685bb146-45e9-4095-89da-04e2c14fcb6f
+  modified: 2026-08-05T04:18:18.268Z
 ---
 
 JFWH org GitHub Project #1 ("JFWH", `PVT_kwDOEfIX884BdhU3`) is the delivery board for jfwh-v2, wired via `.github/project-config.json` (set 2026-07-16). Orchestrator duties live in `pm-workflow` §4–5; collaborator-facing conventions in `doc/agent-operating-model.md`.
@@ -23,5 +24,5 @@ JFWH org GitHub Project #1 ("JFWH", `PVT_kwDOEfIX884BdhU3`) is the delivery boar
 **Board policies (Jack, 2026-07-16)**:
 - Blocked indefinitely / long-horizon → move In progress back to **Backlog** (+`blocked` label + "Blocked on: …" comment). Minimize WIP; short waits don't demote.
 - Ready is Jack-curated (Claude proposes, never promotes); pull top-down.
-- **Everything goes through In review** for Jack's eyes-on by default — the column is his visibility mechanism. Autonomous merge lane is opt-in per explicit request for a task/phase only. Dependabot [[feedback-auto-merge-dependabot]] stays the standing exception.
+- **In review is for experiential QA (policy updated by Jack 2026-08-05, replacing everything-through-In-review):** PRs with member-facing UX (new/changed screens or flows) go to In review and wait for Jack's hands-on pass. PRs with nothing to experience (CI plumbing, repro-proven security fixes, refactors, docs) are the **Architect's merge call** once agent review converges — when in doubt, treat it as having a UX. Dependabot [[feedback-auto-merge-dependabot]] stays the standing exception.
 - PRs get an independent fresh-eyes review from the `reviewer` agent (`.claude/agents/reviewer.md`, Fable-class, no builder context) and loop with the coding agent until PASS, before promotion to In review.

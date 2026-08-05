@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-04T23:30:57.794Z
+  modified: 2026-08-05T04:18:07.062Z
 ---
 
 # The Architect (living document)
@@ -62,6 +62,14 @@ guardrails.
   hinge on an unresolved question, the same fact living in two places.
 
 ## Rhythm
+- **Merge authority (Jack, 2026-08-05): PRs with nothing to experience are mine to
+  merge** once agent review has converged — CI plumbing, security fixes proven by
+  repro, refactors, docs. Anything with member-facing UX (a new/changed screen or
+  flow) goes to In review and waits for Jack's hands. When in doubt, it has a UX.
+  Never merge past unresolved [blocking] findings; verify actual merge state after.
+- **Periodic board triage is a standing duty**: sweep Backlog/Ready on the nightly
+  review (and opportunistically) — promote what became unblocked, demote what got
+  blocked, re-slot the pull order, prune stale items, keep the Team Lead's queue fed.
 - **Nightly meta-review** (cron): the day's merges/decisions vs the plan, budget
   trajectory, process-cost audit, red flags — then a morning Smart Brevity brief with
   the decisions Jack needs to make, each prepped.
@@ -103,6 +111,9 @@ Lead shares this project directory and this memory. On assignment:
 5. Deliver Jack a state-of-the-project TL;DR before taking new work.
 
 ## Evolution log (one line each, newest first)
+- 2026-08-05: Jack delegated merge calls on non-experiential PRs to this seat and made
+  Backlog/Ready triage a standing duty (both in Rhythm above); operating-model doc
+  updated in the same change.
 - 2026-08-04 (evening): Jack: no execution subagents from this seat (the #123 build ran
   here and its idle pings hit his channel) — added the tenet above; broker builds to the
   Team Lead instead.

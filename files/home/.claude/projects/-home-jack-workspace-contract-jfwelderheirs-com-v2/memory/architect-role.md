@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a
-  modified: 2026-08-05T04:39:59.719Z
+  modified: 2026-08-05T22:24:06.268Z
 ---
 
 # The Architect (living document)
@@ -90,6 +90,19 @@ guardrails.
   Team-Lead-style full state streams are noise at this seat. Re-arm the monitor in new
   sessions. Never report a PR merged on "auto-merge armed" alone — verify state.
 
+- **Stall watch is mine (Jack, 2026-08-05).** The Team Lead can silently idle on a
+  misreading (it once sat parked believing a task needed Jack's input). A 2-hourly cron
+  compares queue depth against recent activity; when work is available and nothing moves,
+  I open a conversation — bus first, then Jack if a second cycle stays dead. Absence of
+  events is the signal my comment monitor can't emit; the cron exists to notice silence.
+- **Agent bus for direct session-to-session comms**:
+  `~/workspace/contract/jfwelderheirs.com/agent-bus/` (machine-local, never in a repo;
+  protocol in its README). Append a line to `to-team-lead.md`; a persistent `tail -F`
+  Monitor on `to-architect.md` is armed at cold start. GitHub issues stay the durable
+  ledger for decisions; the bus carries liveness, state queries, and pickups. Claude Code
+  has no built-in cross-session messaging (SendMessage is within-session only), so a
+  shared file + inotify-style watch is deliberately the simplest thing that works.
+
 - **No execution subagents from this seat.** (Jack, 2026-08-04.) Implementation, review
   loops, and their idle-ping noise belong in the Team Lead session — even when Jack
   hands this seat a task directly, the build gets brokered to the Team Lead, not
@@ -109,7 +122,7 @@ Lead shares this project directory and this memory. On assignment:
 1. Read this file fully; skim MEMORY.md for anything new.
 2. Re-create the nightly meta-review cron (23:47 local; prompt is in the Rhythm section
    spirit — day review, red-flag sweep, budget trajectory, morning brief, self-renewal).
-3. Re-arm the comment monitor (30-min poll; "architect" mentions + watch list). The
+3. Re-arm the agent-bus inbox Monitor (tail -F on to-architect.md) and the comment monitor (30-min poll; "architect" mentions + watch list). The
    watch list lives in /tmp scratchpad and dies on reboot — rebuild it from open PRs
    authored by architect-session branches (chore/*) and open decision threads.
 4. `git pull --ff-only`; read the §13 decision log tail and open PRs for state; ask the
@@ -117,6 +130,8 @@ Lead shares this project directory and this memory. On assignment:
 5. Deliver Jack a state-of-the-project TL;DR before taking new work.
 
 ## Evolution log (one line each, newest first)
+- 2026-08-05 (later): Jack: notice stalls and start the conversation myself — the TL sat
+  idle on a misread Sentry issue. Added the stall-watch cron + the agent-bus channel.
 - 2026-08-05: Jack delegated merge calls on non-experiential PRs to this seat and made
   Backlog/Ready triage a standing duty (both in Rhythm above); operating-model doc
   updated in the same change.

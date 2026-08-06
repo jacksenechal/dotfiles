@@ -38,6 +38,8 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/pi-swarm"
   - name: repo-scout
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/repo-scout"
+  - name: scan-to-paperless
+    src: "{{ claude_skills_home }}/workspace/skills/local/scan-to-paperless"
   - name: semi-formal-code-reasoning
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/semi-formal-code-reasoning"
   - name: skill-creator

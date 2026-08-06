@@ -1,0 +1,15 @@
+---
+# Bare-metal @playwright/mcp registered as a stdio `playwright` MCP server for
+# Claude Code. This is Claude's browser on servers (oracle); it has nothing to do
+# with pi, and was only ever colocated with it in the retired pi-base.yaml.
+#
+# localhost sets playwright_mcp_enabled: false in host_vars, because the desktop
+# uses the docker-based playwright-docker skill (SSE servers on :3080/:3081) and
+# this role pins a node version that only exists on the servers.
+- name: Playwright MCP (browser for Claude, server-side)
+  hosts: all
+  become: false
+  roles:
+    - role: playwright_mcp
+      tags: playwright_mcp
+      when: playwright_mcp_enabled | default(true)

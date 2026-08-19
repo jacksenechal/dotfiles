@@ -1,7 +1,7 @@
 ---
 name: feedback-visualize-dags-as-ascii
 description: "When discussing a DAG of PRs, tasks, or dependencies, draw a simple ASCII graph rather than describing it in prose/lists only."
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 52a5b591-0903-4c16-9c09-486d406d8de5

@@ -1,7 +1,7 @@
 ---
 name: neon-preview-branch-pruning
 description: Standing approval to proactively delete stale Neon preview branches in jfwh-v2-preview; how to diagnose the quota failure mode
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 9fb810d2-7324-4a4e-b9af-f1c712f57b38

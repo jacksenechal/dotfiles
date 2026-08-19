@@ -31,9 +31,9 @@
     dest: "{{ item.dest }}"
     perms: yes
   loop:
-    - src: files/root/clamd.conf
-      dest: /etc/clamd.conf
-    - src: files/root/crontab
-      dest: /etc/crontab
-    - src: files/root/rkhunter.conf
-      dest: /etc/rkhunter.conf
+  - src: files/root/clamd.conf
+    dest: /etc/clamd.conf
+  - src: files/root/crontab
+    dest: /etc/crontab
+  - src: files/root/rkhunter.conf
+    dest: /etc/rkhunter.conf

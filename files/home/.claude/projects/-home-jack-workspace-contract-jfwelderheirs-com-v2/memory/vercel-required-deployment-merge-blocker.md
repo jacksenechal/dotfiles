@@ -1,7 +1,7 @@
 ---
 name: vercel-required-deployment-merge-blocker
 description: "jfwh-v2 main once required an \"active\" Preview deployment to merge; removed 2026-07-15 after it blocked green PRs. GraphQL-only field to see/change."
-metadata: 
+metadata:
   node_type: memory
   type: project
   originSessionId: 76c3446b-7a73-4a08-a4a3-b3229fc89dc9

@@ -12,7 +12,7 @@ def set_legacy_theme(mode):
 
 def set_neovim_background(mode):
     command = f"set background={mode}"
-    
+
     # Find the unix sockets for all running neovim instances and send the command to them
     sockets = subprocess.getoutput("nvr --serverlist").split("\n")
 

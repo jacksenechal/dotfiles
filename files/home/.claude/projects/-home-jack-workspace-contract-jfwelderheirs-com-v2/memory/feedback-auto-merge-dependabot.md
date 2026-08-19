@@ -1,7 +1,7 @@
 ---
 name: feedback-auto-merge-dependabot
 description: jfwh-v2 standing policy — auto-merge green Dependabot PRs without per-PR LGTM
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 52a5b591-0903-4c16-9c09-486d406d8de5

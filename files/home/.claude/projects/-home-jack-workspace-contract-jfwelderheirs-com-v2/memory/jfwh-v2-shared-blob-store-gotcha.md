@@ -1,7 +1,7 @@
 ---
 name: jfwh-v2-shared-blob-store-gotcha
 description: jfwh-v2 storage/deploy gotchas — shared public Blob store across local+prod; env changes need redeploy
-metadata: 
+metadata:
   node_type: memory
   type: project
   originSessionId: e699e33e-1c20-4c50-a5d0-c27a9943907c

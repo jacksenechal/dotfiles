@@ -1,7 +1,7 @@
 ---
 name: feedback-clean-up-background-agents
 description: "Stop background subagents/teammates once their work is merged/superseded or fully handed off — don't leave idle agents for the user to notice and close manually."
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 52a5b591-0903-4c16-9c09-486d406d8de5

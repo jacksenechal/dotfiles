@@ -1,7 +1,7 @@
 ---
 name: jfwh-project-board
 description: JFWH GitHub Project
-metadata: 
+metadata:
   node_type: memory
   type: project
   originSessionId: 685bb146-45e9-4095-89da-04e2c14fcb6f

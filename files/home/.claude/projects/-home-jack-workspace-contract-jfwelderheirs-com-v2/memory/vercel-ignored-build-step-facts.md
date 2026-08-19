@@ -1,7 +1,7 @@
 ---
 name: vercel-ignored-build-step-facts
 description: "Vercel Ignored Build Step: no fetch creds for other branches, and a skip emits no deployment_status"
-metadata: 
+metadata:
   node_type: memory
   type: reference
   originSessionId: d27092e5-440d-4db5-abde-165d649b2d05

@@ -1,7 +1,7 @@
 ---
 name: architect-role
 description: "The living Architect role — Jack's digital twin; self-evolving archetype, priorities, and meta-cognition"
-metadata: 
+metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a

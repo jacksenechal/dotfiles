@@ -1,7 +1,7 @@
 ---
 name: feedback-planning-tasks-need-strong-models
 description: "Delegate planning/judgment work to Fable- or Opus-class agents, not Sonnet"
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: d27092e5-440d-4db5-abde-165d649b2d05

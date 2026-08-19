@@ -1,7 +1,7 @@
 ---
 name: feedback-no-dash-rule-scope
 description: "The no-em-dash rule covers human communication only, not repo prose"
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 3b5e1612-9b9a-4c84-b2e4-63548026ec5f

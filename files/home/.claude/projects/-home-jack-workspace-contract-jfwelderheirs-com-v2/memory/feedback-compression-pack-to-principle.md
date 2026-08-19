@@ -1,7 +1,7 @@
 ---
 name: feedback-compression-pack-to-principle
 description: "Reductive editing = pack emanated detail back to its backing principle, not just trim/dedup"
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: d27092e5-440d-4db5-abde-165d649b2d05

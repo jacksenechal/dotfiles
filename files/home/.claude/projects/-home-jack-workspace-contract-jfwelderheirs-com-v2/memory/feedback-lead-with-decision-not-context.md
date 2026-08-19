@@ -1,7 +1,7 @@
 ---
 name: feedback-lead-with-decision-not-context
 description: "Ask the crisp question first; don't front-load paragraphs of context Jack re-derives anyway"
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: d27092e5-440d-4db5-abde-165d649b2d05

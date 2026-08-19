@@ -1,7 +1,7 @@
 ---
 name: feedback-flag-concerns-as-pr-comments
 description: "When flagging a concern about a PR, post it as a PR comment — not only in the session"
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 3b5e1612-9b9a-4c84-b2e4-63548026ec5f

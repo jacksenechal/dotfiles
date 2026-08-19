@@ -1,7 +1,7 @@
 ---
 name: dependabot-wait-posture
 description: "Pre-launch, don't proactively open security bump PRs; wait for Dependabot"
-metadata: 
+metadata:
   node_type: memory
   type: project
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a

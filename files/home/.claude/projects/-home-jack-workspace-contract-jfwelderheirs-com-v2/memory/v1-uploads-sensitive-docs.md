@@ -1,7 +1,7 @@
 ---
 name: v1-uploads-sensitive-docs
 description: Never Read/upload v1 WP document files (PDF/DOC/XLS) to the API — sensitive family financial/legal content; photos are OK
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: 08e986d2-86c0-4aae-b992-378685f4a29a

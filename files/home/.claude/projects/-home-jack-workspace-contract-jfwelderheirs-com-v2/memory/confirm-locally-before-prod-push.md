@@ -1,7 +1,7 @@
 ---
 name: confirm-locally-before-prod-push
 description: Workflow rule for jfwh-v2 — verify changes locally before pushing to prod (Vercel auto-deploys main)
-metadata: 
+metadata:
   node_type: memory
   type: feedback
   originSessionId: e699e33e-1c20-4c50-a5d0-c27a9943907c

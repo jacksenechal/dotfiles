@@ -1,0 +1,36 @@
+--- /home/jack/.local/share/omarchy/config/hypr/hyprland.conf	2026-06-13 14:06:38.854975643 -0700
++++ hypr/hyprland.conf	2026-06-13 14:13:50.567001407 -0700
+@@ -1,4 +1,4 @@
+-# Learn how to configure Hyprland: https://wiki.hypr.land/Configuring/
++# Learn how to configure Hyprland: https://wiki.hyprland.org/Configuring/
+ 
+ # Use defaults Omarchy defaults (but don't edit these directly!)
+ source = ~/.local/share/omarchy/default/hypr/autostart.conf
+@@ -16,11 +16,24 @@
+ source = ~/.config/hypr/monitors.conf
+ source = ~/.config/hypr/input.conf
+ source = ~/.config/hypr/bindings.conf
++source = ~/.config/hypr/envs.conf
+ source = ~/.config/hypr/looknfeel.conf
+ source = ~/.config/hypr/autostart.conf
+ 
++# Add any other personal Hyprland configuration below
++# windowrule = workspace 5, class:qemu
++
++# .config/hypr/hyprland.conf
++# plugin {
++#     hyprexpo {
++#         columns = 3
++#         gap_size = 5
++#         bg_col = rgb(111111)
++#         workspace_method = center current # [center/first] [workspace] e.g. first 1 or center m+1
++
++#         gesture_distance = 300 # how far is the "max" for the gesture
++#     }
++# }
++
+ # Toggle config flags dynamically
+ source = ~/.local/state/omarchy/toggles/hypr/*.conf
+-
+-# Add any other personal Hyprland configuration below
+-# windowrule = workspace 5, match:class qemu

@@ -1,0 +1,72 @@
+--- /home/jack/.local/share/omarchy/config/kitty/kitty.conf	2026-08-18 15:30:38.496211956 -0700
++++ kitty/kitty.conf	2026-08-18 15:57:15.630662303 -0700
+@@ -1,34 +1,37 @@
+-include ~/.config/omarchy/current/theme/kitty.conf
+-
+-# Font
+-font_family JetBrainsMono Nerd Font
+-bold_italic_font auto
+-font_size        9.0
+-
+-# Window
+-window_padding_width 14
++# Visual configuration
++include ./theme.conf # Download themes from https://github.com/dexpota/kitty-themes
++font_family Fira Code
++font_size 11.0
++font_weight normal
++dynamic_background_opacity yes
++background_opacity 0.9
++background_blur 5
++tab_bar_style powerline
++scrollback_indicator_opacity 0.1
+ hide_window_decorations yes
+-confirm_os_window_close 0
+-
+-# Keybindings
+-map ctrl+insert copy_to_clipboard
+-map shift+insert paste_from_clipboard
+-# Send Shift+Enter as CSI-u so TUIs can distinguish it from Enter.
+-map shift+enter send_text all \e[13;2u
+-# Kitty legacy encoding sends Alt+Shift+Enter the same as Alt+Enter; send CSI-u so tmux can match M-S-Enter.
+-map alt+shift+enter send_text all \e[13;4u
+-
+-# Allow remote access
+-allow_remote_control yes
+-
+-# Aesthetics
+-cursor_shape block
+-cursor_blink_interval 0
+-shell_integration no-cursor
++window_border_width 0
++window_padding_width 0
++window_margin_width 0
++window_border_height 0
++window_padding_height 0
++window_margin_height 0
++draw_minimal_borders yes
++map kitty_mod+period set_background_opacity +0.1
++map kitty_mod+comma set_background_opacity -0.1
++map kitty_mod+slash set_background_opacity default
++
++# Wiondow management configuration
++map f1 goto_layout grid
++map f2 goto_layout vertical
++map f3 goto_layout horizontal
++map f4 goto_layout splits
++
++# Behavior configuration
++allow_remote_control socket-only
++listen_on unix:/tmp/kitty.sock
++remember_window_size  yes
++map ctrl+shift+t new_tab_with_cwd
++touch_scroll_multiplier 2.0
+ enable_audio_bell no
+-
+-# Minimal Tab bar styling
+-tab_bar_edge                bottom
+-tab_bar_style               powerline
+-tab_powerline_style         slanted
+-tab_title_template          {title}{' :{}:'.format(num_windows) if num_windows > 1 else ''}
++scrollback_lines 10000
++placement_strategy center

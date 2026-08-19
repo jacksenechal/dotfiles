@@ -1,6 +1,7 @@
 # archive/
 
-Ansible roles and playbooks that are no longer applied, kept for reference rather than
+Reference material that is deliberately inert: Ansible roles and playbooks that are no longer
+applied, plus point-in-time config snapshots taken before risky migrations. Kept rather than
 deleted. Nothing in here is on the default role search path (`ansible.cfg` sets no
 `roles_path`, so roles resolve from `./roles` relative to the playbook), which means these
 cannot be invoked by accident. To revive one, move it back under `roles/` and re-add it to a
@@ -34,3 +35,14 @@ their own playbooks so they keep working:
 
 If you ever restore `pi-base.yaml`, drop those two role entries from it rather than running
 both copies.
+
+## omarchy-3.8.5 (captured 2026-08-18)
+
+Snapshot of every tweaked `~/.config` file, taken immediately before the Omarchy 4 ("Quattro")
+upgrade. Verbatim copies plus unified diffs against the Omarchy 3.8.5 defaults, a package
+list, and a triage of which tweaks survive Quattro — the release replaces Waybar, Walker,
+Mako, SwayOSD, hyprlock, and hypridle with a single Quickshell process.
+
+Not a role and not deployed. It sits in `archive/` specifically so the `files` role never
+symlinks it into `~`: Omarchy migrations use `sed -i`, which replaces a file's inode and
+would silently break any symlink pointing back here. See `omarchy-3.8.5/README.md`.

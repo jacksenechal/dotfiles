@@ -1,0 +1,10 @@
+android-sdk
+android-sdk-cmdline-tools-latest
+android-sdk-debug
+android-sdk-platform-tools
+android-sdk-platform-tools-debug
+slack-desktop
+sweethome3d-furniture-library
+synology-drive
+synology-drive-debug
+zotero-bin

@@ -1,3 +1,10 @@
+---
+# Config snapshots under archive/ must stay byte-identical to what was captured.
+# trailing-whitespace and end-of-file-fixer would silently rewrite them, and at
+# least two snapshotted files differ from their upstream default by whitespace
+# alone, so a "cleanup" would erase the very difference being recorded.
+exclude: '^archive/omarchy-[0-9.]+/'
+
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.5.0

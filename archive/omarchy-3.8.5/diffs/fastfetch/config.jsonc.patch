@@ -1,0 +1,11 @@
+--- /home/jack/.local/share/omarchy/config/fastfetch/config.jsonc	2025-12-19 09:21:18.625776993 -0800
++++ fastfetch/config.jsonc	2025-12-04 12:41:21.901110629 -0800
+@@ -134,7 +134,7 @@
+       "type": "command",
+       "key": "󱦟 OS Age",
+       "keyColor": "magenta",
+-      "text": "echo $(( ($(date +%s) - $(stat -c %W /)) / 86400 )) days"
++      "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
+     },
+     {
+       "type": "uptime",

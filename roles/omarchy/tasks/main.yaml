@@ -1,0 +1,30 @@
+---
+- name: Detect Omarchy
+  ansible.builtin.stat:
+    path: /usr/share/omarchy
+  register: omarchy_root
+
+- name: Skip unless this is an Omarchy system
+  ansible.builtin.meta: end_role
+  when: not (omarchy_root.stat.isdir | default(false))
+
+- name: Wire the Omarchy overlays
+  ansible.builtin.include_role:
+    name: overlays
+  vars:
+    overlay_includes: "{{ omarchy_overlay_includes }}"
+    overlay_symlink_checks: "{{ omarchy_overlay_symlink_checks }}"
+
+- name: Ensure the Omarchy post-update hook directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['env']['HOME'] }}/.config/omarchy/hooks/post-update.d"
+    state: directory
+    mode: "0755"
+
+# The include lines are the pattern's only exposed surface. This re-adds any that
+# a migration removes, immediately after migrations run.
+- name: Install the post-update guard
+  ansible.builtin.template:
+    src: dotfiles-overlay.sh.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/omarchy/hooks/post-update.d/10-dotfiles-overlay"
+    mode: "0755"

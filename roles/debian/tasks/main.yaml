@@ -1,0 +1,13 @@
+---
+- name: Skip unless this is a Debian-family system
+  ansible.builtin.meta: end_role
+  when: ansible_facts['os_family'] != 'Debian'
+
+# Nothing distro-specific to assert, but run the engine so the symlink health
+# check reports overlay files that have come detached from the repo.
+- name: Verify overlay wiring
+  ansible.builtin.include_role:
+    name: overlays
+  vars:
+    overlay_includes: "{{ debian_overlay_includes }}"
+    overlay_symlink_checks: "{{ debian_overlay_symlink_checks }}"

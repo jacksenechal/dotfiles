@@ -1,0 +1,17 @@
+---
+# Overlay entries that apply on every distro. See roles/overlays/README.md.
+#
+# ~/.bashrc is seeded from /etc/skel by the distro and carries distro-specific
+# setup, so this repo does not own it. Instead .bashrc_jack is tracked and
+# symlinked, and one source line is asserted into ~/.bashrc - the overlay pattern,
+# which this repo used for bash long before the pattern had a name. It lived as a
+# one-off `lineinfile` in the files role until 2026-08-19.
+overlays_universal:
+  - name: bash
+    path: .bashrc
+    comment: "#"
+    line: "[ -f ~/.bashrc_jack ] && source ~/.bashrc_jack"
+
+overlays_universal_links:
+  - .bashrc_jack
+  - .bash_aliases_jack

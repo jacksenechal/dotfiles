@@ -1,0 +1,13 @@
+---
+# Vanilla Arch: pacman never writes into $HOME. Base configs under ~/.config are
+# created by the app on first run or seeded from /usr/share, and nothing upgrades
+# them behind your back. So there is no distro-owned file to patch - this repo
+# can own the base config outright and the include line is simply part of the
+# tracked file.
+#
+# This is the baseline case. Omarchy is the exception that motivated the whole
+# overlay pattern: see roles/omarchy.
+arch_overlay_includes: []
+
+arch_overlay_symlink_checks:
+  - .config/tmux/local.conf

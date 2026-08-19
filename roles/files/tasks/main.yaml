@@ -15,8 +15,21 @@
     link_tree_src: "{{ playbook_dir }}/files/desktop"
   when: inventory_hostname in groups['local']
 
-- name: Ensure bashrc line exists
-  ansible.builtin.lineinfile:
-    path: ~/.bashrc
-    line: "[ -f ~/.bashrc_jack ] && source ~/.bashrc_jack"
-    state: present
+# Machine-dependent configs: audio devices, hotkeys, display wiring. Keyed on the
+# real hostname rather than the inventory name, because every workstation is
+# `localhost` in the inventory and host_vars therefore cannot tell them apart.
+# A host with no tree here is normal, not an error.
+- name: Check for a per-host file tree
+  ansible.builtin.stat:
+    path: "{{ playbook_dir }}/files/hosts/{{ ansible_facts['hostname'] }}"
+  register: files_host_tree
+
+- name: "Symlink per-host config files for {{ ansible_facts['hostname'] }}"
+  ansible.builtin.include_tasks: link_tree.yml
+  vars:
+    link_tree_src: "{{ playbook_dir }}/files/hosts/{{ ansible_facts['hostname'] }}"
+  when: files_host_tree.stat.isdir | default(false)
+
+# The ~/.bashrc source line moved to the overlays role (group_vars/all.yaml).
+# This role only symlinks tracked files; wiring them into distro-owned configs
+# is the overlays role's job.

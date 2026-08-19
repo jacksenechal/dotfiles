@@ -1,0 +1,12 @@
+---
+# Debian and Ubuntu: apt does not write into $HOME. Base configs under ~ are
+# seeded from /etc/skel at account creation and never upgraded behind your back,
+# so there is no distro-owned file needing a patched include beyond ~/.bashrc,
+# which is handled universally in group_vars/all.yaml.
+#
+# Same conclusion as vanilla Arch. Omarchy remains the outlier: see roles/omarchy.
+# This role is the extension point if that ever changes.
+debian_overlay_includes: []
+
+debian_overlay_symlink_checks:
+  - .config/tmux/local.conf

@@ -1,0 +1,48 @@
+---
+# Engine only. Distro roles supply overlay_includes; see roles/overlays/README.md
+# for why the overlay pattern exists rather than symlinking base configs.
+
+# A base config is only present if the app is installed. Skipping a missing one
+# keeps the overlay file tracked and portable without requiring the app here.
+- name: Check which base configs exist
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/{{ item.path }}"
+  register: overlays_base
+  loop: "{{ overlay_includes }}"
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Assert the overlay include line
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_facts['env']['HOME'] }}/{{ item.item.path }}"
+    marker: "{{ item.item.comment }} {mark} dotfiles overlay"
+    marker_begin: BEGIN
+    marker_end: END
+    block: |
+      {{ item.item.comment }} Personal overrides live in a file this distro does not
+      {{ item.item.comment }} own, loaded last so they win. Re-asserted after updates
+      {{ item.item.comment }} by ~/.config/omarchy/hooks/post-update.d/ where relevant.
+      {{ item.item.line }}
+    create: false
+  loop: "{{ overlays_base.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.stat.exists | default(false)
+
+- name: Warn if an overlay file is no longer a symlink into the repo
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
+  register: overlays_links
+  loop: "{{ overlay_symlink_checks }}"
+
+- name: Report detached overlay files
+  ansible.builtin.debug:
+    msg: >-
+      {{ item.item }} exists but is not a symlink into this repo; edits there are
+      not tracked. The files role will re-link it.
+  loop: "{{ overlays_links.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  when:
+    - item.stat.exists | default(false)
+    - not (item.stat.islnk | default(false))

@@ -36,13 +36,18 @@ their own playbooks so they keep working:
 If you ever restore `pi-base.yaml`, drop those two role entries from it rather than running
 both copies.
 
-## omarchy-3.8.5 (captured 2026-08-18)
+## omarchy-3.8.5 (removed 2026-08-19)
 
-Snapshot of every tweaked `~/.config` file, taken immediately before the Omarchy 4 ("Quattro")
-upgrade. Verbatim copies plus unified diffs against the Omarchy 3.8.5 defaults, a package
-list, and a triage of which tweaks survive Quattro — the release replaces Waybar, Walker,
-Mako, SwayOSD, hyprlock, and hypridle with a single Quickshell process.
+A snapshot of every tweaked `~/.config` file, taken just before the Omarchy 4
+("Quattro") upgrade, lived here. It has served its purpose: the tweaks worth
+keeping were carried into the overlay files under `files/`, the rest was
+identified as drift and dropped, and the Hyprland monitor layout was declined
+because Quattro's generic `preferred/auto` handles the displays. See
+`CHANGELOG.md`.
 
-Not a role and not deployed. It sits in `archive/` specifically so the `files` role never
-symlinks it into `~`: Omarchy migrations use `sed -i`, which replaces a file's inode and
-would silently break any symlink pointing back here. See `omarchy-3.8.5/README.md`.
+Recover it if needed - it includes the explicit and foreign package lists, which
+are the part with residual value for a rebuild:
+
+```sh
+git checkout b6d6680 -- archive/omarchy-3.8.5
+```

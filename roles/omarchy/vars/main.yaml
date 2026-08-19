@@ -1,0 +1,29 @@
+---
+# Base files below are Omarchy's and stay untracked, so its migrations can keep
+# updating them. Omarchy's migrations checksum these files and skip ones you have
+# modified, so leaving them pristine is what keeps them current.
+#
+# `path` is relative to $HOME; `comment` is the file's comment leader.
+omarchy_overlay_includes:
+  - name: tmux
+    path: .config/tmux/tmux.conf
+    comment: "#"
+    line: source-file -q ~/.config/tmux/local.conf
+
+  - name: kitty
+    path: .config/kitty/kitty.conf
+    comment: "#"
+    line: include ./local.conf
+
+  - name: hyprland
+    path: .config/hypr/hyprland.lua
+    comment: "--"
+    line: require("hypr.jack")
+
+omarchy_overlay_symlink_checks:
+  - .config/tmux/local.conf
+  - .config/kitty/local.conf
+  - .config/hypr/jack.lua
+  - .config/hypr/jack/bindings.lua
+  - .config/hypr/jack/input.lua
+  - .config/hypr/jack/looknfeel.lua

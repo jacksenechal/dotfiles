@@ -1,0 +1,13 @@
+---
+- name: Skip unless this is an Arch-family system
+  ansible.builtin.meta: end_role
+  when: ansible_facts['os_family'] != 'Archlinux'
+
+# Nothing to assert on vanilla Arch, but run the engine anyway so the symlink
+# health check reports on overlay files that have come detached.
+- name: Verify overlay wiring
+  ansible.builtin.include_role:
+    name: overlays
+  vars:
+    overlay_includes: "{{ arch_overlay_includes }}"
+    overlay_symlink_checks: "{{ arch_overlay_symlink_checks }}"

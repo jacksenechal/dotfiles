@@ -1,0 +1,11 @@
+---
+# Consumed from a distro role via include_role. Each entry describes one
+# distro-owned base config and the single line that pulls in our overlay:
+#   name    - label for output
+#   path    - base config, relative to $HOME
+#   comment - the file's comment leader, for the blockinfile marker
+#   line    - the include/source/require line to assert
+overlay_includes: []
+
+# Overlay files that must remain symlinks into this repo, relative to $HOME.
+overlay_symlink_checks: []

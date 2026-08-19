@@ -8,6 +8,20 @@
     #   tags: tumbleweed
     - role: files
       tags: files
+    # Wire this repo's overlay files into configs the distro owns. The universal
+    # entries run everywhere; the distro roles add their own and are a no-op off
+    # their own distro. omarchy depends on arch.
+    - role: overlays
+      tags: overlays
+      vars:
+        overlay_includes: "{{ overlays_universal }}"
+        overlay_symlink_checks: "{{ overlays_universal_links }}"
+    - role: arch
+      tags: [arch, overlays]
+    - role: omarchy
+      tags: [omarchy, overlays]
+    - role: debian
+      tags: [debian, overlays]
     - role: secrets
       tags: secrets
     - role: python
@@ -20,7 +34,7 @@
       tags: local_utilities
 
   # tasks:
-    
+
     # - name: Fetch ohmyzsh
     #   ansible.builtin.get_url:
     #     url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh

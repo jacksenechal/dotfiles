@@ -1,9 +1,0 @@
---- /home/jack/.local/share/omarchy/config/git/config	2025-11-13 15:15:30.260554546 -0800
-+++ git/config	2025-11-13 15:17:17.927014027 -0800
-@@ -26,3 +26,6 @@
- [rerere]
- 	enabled = true           # Record and reuse conflict resolutions
- 	autoupdate = true        # Apply stored conflict resolutions automatically
-+[user]
-+	name = Jack Senechal
-+	email = jacksenechal@gmail.com

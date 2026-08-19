@@ -1,0 +1,4 @@
+---
+# Omarchy is Arch underneath; inherit the baseline before layering its own wiring.
+dependencies:
+  - role: arch

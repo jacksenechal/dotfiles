@@ -1,6 +1,0 @@
-omarchy version: 3.8.5
-omarchy git:     v3.8.4-5-gf4378f0d
-omarchy branch:  master
-theme:           catppuccin-latte
-kernel:          7.1.8-arch1-3
-captured:        2026-08-18

@@ -1,8 +1,0 @@
---- /home/jack/.local/share/omarchy/config/swayosd/config.toml	2026-03-01 07:40:53.279264614 -0800
-+++ swayosd/config.toml	2025-11-13 15:17:17.296624298 -0800
-@@ -1,4 +1,4 @@
- [server]
- show_percentage = true
- max_volume = 100
--style = "~/.config/swayosd/style.css"
-+style = "./style.css"

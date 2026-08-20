@@ -22,6 +22,10 @@
       tags: [omarchy, overlays]
     - role: debian
       tags: [debian, overlays]
+    # Rendered, not symlinked: its audio device and hotkey ownership are
+    # machine-dependent, and `voxtype configure` rewrites the file in place.
+    - role: voxtype
+      tags: voxtype
     - role: secrets
       tags: secrets
     - role: python

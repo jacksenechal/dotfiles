@@ -2,6 +2,43 @@
 
 Notable changes to this repo. Newest first.
 
+## 2026-08-19 - voxtype rendered per machine
+
+Triaged both voxtype configs against the packaged default at
+`/etc/voxtype/config.toml` rather than against each other. The desktop's is a
+strict superset - 28 keys against the laptop's 16 and the stock default's 19 -
+carrying the whole `[meeting]` tree the laptop omits. So the desktop is now the
+baseline, contrary to first assumption.
+
+Only three settings are genuinely machine-dependent:
+
+| Setting | laptop | desktop |
+|---|---|---|
+| `audio.device` | `default` | `echocancel` (PipeWire sink) |
+| `hotkey.enabled` | `false` - Hyprland binds it | `true` |
+| `hotkey.key` | n/a | `RIGHTALT` |
+
+Duplicating a 343-line file per host for three keys was the wrong trade, so
+`roles/voxtype` renders it from a template with values in `voxtype_machines`
+(`group_vars/all.yaml`), keyed on the real hostname. `files/hosts/` keeps the
+per-host tree construct for configs that vary throughout rather than in a few
+keys; it currently has no inhabitants.
+
+Templating is also the more robust choice here: `voxtype configure` rewrites the
+file in place, which a symlink would not survive.
+
+Verified by rendering both variants and comparing parsed key/value pairs: the
+desktop render is identical to its previous config, and the laptop render changes
+no existing value. The laptop does pick up two things from the baseline - the
+explicit `[meeting]` block, whose rendered values match what it was already
+inheriting implicitly, and `output.shift_enter_newlines = true`, which it was not
+setting before. That one is a real behaviour change.
+
+Two laptop-only preferences are preserved as machine overrides rather than folded
+into the baseline: `notification.on_transcription = false` and `type_delay_ms = 1`.
+If they turn out to be stale rather than deliberate, deleting those two lines from
+`voxtype_machines` adopts the baseline.
+
 ## 2026-08-19 - Overlays generalised across distros
 
 - **`~/.bashrc` is now a first-class overlay.** The `source ~/.bashrc_jack` line

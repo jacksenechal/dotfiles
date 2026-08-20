@@ -15,3 +15,24 @@ overlays_universal:
 overlays_universal_links:
   - .bashrc_jack
   - .bash_aliases_jack
+
+# Per-machine voxtype settings, merged over roles/voxtype/defaults. Keyed on the
+# real hostname for the same reason files/hosts is: every workstation is
+# `localhost` in the inventory, so host_vars cannot tell them apart. A machine
+# with no entry takes the defaults unchanged.
+voxtype_machines:
+  omarchy7320:  # laptop
+    # Omarchy binds recording in Hyprland, so voxtype must not grab the key too.
+    hotkey_enabled: false
+    audio_device: default
+    # Laptop-only preferences carried over from its old standalone config. If
+    # these turn out to be stale rather than deliberate, delete these two lines
+    # and the machine adopts the baseline.
+    notify_on_transcription: false
+    type_delay_ms: 1
+
+  archlinux:  # desktop - hostname unverified, see files/hosts/README.md
+    hotkey_enabled: true
+    hotkey_key: RIGHTALT
+    # PipeWire echo-cancel sink, configured by the drop-in in files/desktop.
+    audio_device: echocancel

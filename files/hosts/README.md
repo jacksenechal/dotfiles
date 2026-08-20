@@ -22,10 +22,13 @@ The desktop's hostname has not been confirmed from the desktop itself. If it is
 wrong the tree simply never matches and nothing is linked; rename the directory
 to whatever `hostname` reports there.
 
-## Why voxtype lives here
+## Currently empty
 
-`files/desktop` links onto every workstation, so the desktop's voxtype config
-(`device = "echocancel"`, pairing with the desktop's PipeWire echo-cancel sink)
-was being applied to the laptop too, which has no such sink and uses
-`device = "default"`. The two copies are also on different voxtype schema
-generations. They are genuinely different files, not drift.
+voxtype was the first candidate and then moved on: only three of its settings are
+actually machine-dependent, so duplicating a 343-line file per host was the wrong
+trade. It is rendered by `roles/voxtype` instead. See "Rendered, not symlinked" in
+the top-level README for when to pick which.
+
+This tree is still the right home for a config that is machine-dependent
+*throughout* rather than in a few keys - display wiring, or a config whose format
+has no way to express a variable.

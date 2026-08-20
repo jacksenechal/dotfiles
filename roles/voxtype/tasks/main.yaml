@@ -1,0 +1,36 @@
+---
+# voxtype's config carries two genuinely machine-dependent settings - which audio
+# source to capture, and whether voxtype or the compositor owns the hotkey - so it
+# is rendered rather than symlinked. `voxtype configure` also rewrites this file
+# in place, which a symlink would not survive.
+
+- name: Check whether voxtype is installed
+  ansible.builtin.stat:
+    path: /usr/bin/voxtype
+  register: voxtype_bin
+
+- name: Skip unless voxtype is installed
+  ansible.builtin.meta: end_role
+  when: not (voxtype_bin.stat.exists | default(false))
+
+- name: Resolve voxtype settings for this machine
+  ansible.builtin.set_fact:
+    voxtype: >-
+      {{ voxtype_defaults
+         | combine(voxtype_machines[ansible_facts['hostname']] | default({})) }}
+
+- name: Render the voxtype config
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: "{{ ansible_facts['env']['HOME'] }}/.config/voxtype/config.toml"
+    mode: "0644"
+    backup: true
+  register: voxtype_config
+
+- name: Restart the voxtype daemon
+  ansible.builtin.systemd_service:
+    name: voxtype
+    scope: user
+    state: restarted
+  when: voxtype_config.changed
+  failed_when: false

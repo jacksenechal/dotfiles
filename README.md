@@ -50,6 +50,27 @@ point plus a symlink health check.
 Day to day nothing changes: edit the overlay file at either path, `git diff`
 shows it, commit.
 
+### Rendered, not symlinked
+
+A third case sits outside both mechanisms above: configs whose *content* varies
+by machine. A symlink cannot hold two values, so these are rendered from a
+template with per-machine variables.
+
+`roles/voxtype` is the worked example. Two of its settings genuinely differ - the
+audio source (`default` on the laptop, the PipeWire `echocancel` sink on the
+desktop) and whether voxtype grabs the push-to-talk key itself or leaves it to
+the compositor, since Omarchy binds recording in Hyprland. Everything else is
+shared. Per-machine values live in `voxtype_machines` in `group_vars/all.yaml`,
+keyed on the real hostname; a machine with no entry takes the defaults.
+
+Templating also happens to be more robust here than symlinking would be, because
+`voxtype configure` rewrites the config in place and would destroy a symlink.
+
+**The trade-off:** a rendered file is generated, so editing it in `~/.config` no
+longer edits the repo. Reach for this only when content genuinely varies per
+machine. Prefer a direct symlink, then an overlay, then `files/hosts/`, and only
+then a template.
+
 ### Adopting this on another machine
 
 The playbook deliberately does **not** reset distro base configs to stock - that

@@ -1,0 +1,16 @@
+---
+# Baseline is the desktop's configuration. Per-machine overrides live in
+# group_vars/all.yaml under voxtype_machines, keyed on the real hostname.
+voxtype_defaults:
+  # Built-in hotkey detection. Turn off where the compositor binds recording
+  # instead (Omarchy binds F9 and SUPER+CTRL+X in default/hypr/bindings/voxtype.lua),
+  # then drive it with `voxtype record start/stop/toggle`.
+  hotkey_enabled: true
+  hotkey_key: RIGHTALT
+  hotkey_modifiers: []
+
+  # `pactl list sources short` to enumerate.
+  audio_device: default
+
+  notify_on_transcription: true
+  type_delay_ms: 0

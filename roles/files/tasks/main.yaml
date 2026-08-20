@@ -8,6 +8,11 @@
   ansible.builtin.include_tasks: link_tree.yml
   vars:
     link_tree_src: "{{ playbook_dir }}/files/home"
+    # Claude writes NEW memory files into this directory. Per-file links would
+    # leave those as untracked real files; a whole-directory symlink captures
+    # them in the repo automatically. The claude_skills role owns that link.
+    link_tree_excludes:
+      - "\\.claude/projects"
 
 - name: Symlink desktop-only config files into place
   ansible.builtin.include_tasks: link_tree.yml

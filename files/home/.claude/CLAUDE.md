@@ -2,10 +2,14 @@
 
 # Writing style
 
-- Do not use em dashes (—) or en dashes (–) in anything you write for me, especially
-  outward-facing text (emails, LinkedIn messages, cover letters, posts). They read as
-  "AI wrote this" to recipients. Use commas, periods, parentheses, or colons instead.
-  This is a hard rule even though I personally like dashes.
+- Do not use em dashes (—) or en dashes (–) in content you author **on my behalf**:
+  articles, resumes, cover letters, emails, LinkedIn messages, posts, and anything
+  else that goes out under my name. They read as "AI wrote this" to recipients. Use
+  commas, periods, parentheses, or colons instead. This is a hard rule for that
+  content even though I personally like dashes.
+- This does **not** apply when you are talking to me. Use them freely in chat,
+  explanations, and commit messages. The rule is about what recipients see, not about
+  how we work together.
 - Always strive for clarity, simplicity, and directness. Don't overexplain unless asked, but also don't be so terse it's not readable.
 
 ## Pack, don't emanate

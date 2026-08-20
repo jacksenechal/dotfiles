@@ -15,6 +15,25 @@
     - "{{ claude_skills_home }}/.claude/skills"
 
 # ---------------------------------------------------------------------------
+# (A2) Retire the pre-split layout. Before agent-tools was split into public and
+#      private halves, ~/workspace/skills/local was a symlink into
+#      agent-tools/skills. The clone below needs a real directory there, and the
+#      git module fails against a symlink pointing at a non-repo. Removing a
+#      symlink loses nothing; a real directory is left alone.
+# ---------------------------------------------------------------------------
+- name: Check ~/workspace/skills/local
+  ansible.builtin.stat:
+    path: "{{ claude_skills_home }}/workspace/skills/local"
+    follow: false
+  register: claude_skills_local_dir
+
+- name: Remove the pre-split skills/local symlink
+  ansible.builtin.file:
+    path: "{{ claude_skills_home }}/workspace/skills/local"
+    state: absent
+  when: claude_skills_local_dir.stat.islnk | default(false)
+
+# ---------------------------------------------------------------------------
 # (B) Clone skill repos (update: no — never resets existing checkouts)
 # ---------------------------------------------------------------------------
 - name: Clone skill repos if absent
@@ -48,6 +67,42 @@
   loop: "{{ claude_skills_skill_links }}"
   loop_control:
     label: "{{ item.name }}"
+
+- name: Symlink workstation-only Claude skills
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ claude_skills_home }}/.claude/skills/{{ item.name }}"
+    state: link
+    force: yes
+  loop: "{{ claude_skills_workstation_skill_links }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: inventory_hostname in groups['local']
+
+# (D2) `update: no` above means a stale checkout is never refreshed, which is
+#      deliberate - it must never reset a repo with local work. The cost is that
+#      a skill added upstream leaves a dangling symlink with no warning. Report
+#      those rather than fixing them silently; the fix is a pull in that repo.
+- name: Check that every skill link resolves
+  ansible.builtin.stat:
+    path: "{{ claude_skills_home }}/.claude/skills/{{ item.name }}"
+  register: claude_skills_link_check
+  loop: >-
+    {{ claude_skills_skill_links
+       + (claude_skills_workstation_skill_links
+          if inventory_hostname in groups['local'] else []) }}
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Report dangling skill links
+  ansible.builtin.debug:
+    msg: >-
+      {{ item.item.name }} points at {{ item.item.src }}, which does not exist.
+      That repo is probably behind; pull it and re-run.
+  loop: "{{ claude_skills_link_check.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: not (item.stat.exists | default(false))
 
 # ---------------------------------------------------------------------------
 # (E) Symlink global Claude config docs from the dotfiles repo.

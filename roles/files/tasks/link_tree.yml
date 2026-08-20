@@ -12,12 +12,23 @@
     hidden: true # dotfiles and dot-directories (.config, .zshrc, ...)
   register: link_tree_found
 
+# Some subtrees are deliberately linked as whole directories elsewhere (see the
+# claude_skills role). Per-file links there would win the race and then block the
+# directory link, so skip them here.
+- name: "Drop excluded subtrees under {{ link_tree_src }}"
+  ansible.builtin.set_fact:
+    link_tree_files: >-
+      {{ link_tree_found.files
+         | rejectattr('path', 'search', '/(' ~ (link_tree_excludes | default([]) | join('|')) ~ ')/')
+         | list
+         if (link_tree_excludes | default([])) else link_tree_found.files }}
+
 - name: "Ensure parent directories exist for {{ link_tree_src }}"
   ansible.builtin.file:
     path: "{{ (ansible_facts['env']['HOME'] ~ '/' ~ (item.path | relpath(link_tree_src))) | dirname }}"
     state: directory
     mode: "0755"
-  loop: "{{ link_tree_found.files }}"
+  loop: "{{ link_tree_files }}"
   loop_control:
     label: "{{ item.path | relpath(link_tree_src) }}"
 
@@ -28,6 +39,6 @@
     state: link
     force: true # replace any pre-existing regular file (migration from copy)
     follow: false
-  loop: "{{ link_tree_found.files }}"
+  loop: "{{ link_tree_files }}"
   loop_control:
     label: "{{ item.path | relpath(link_tree_src) }}"

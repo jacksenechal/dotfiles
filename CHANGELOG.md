@@ -2,6 +2,47 @@
 
 Notable changes to this repo. Newest first.
 
+## 2026-08-19 - Claude skills reconciled; two roles stopped fighting
+
+Reconciled `~/.claude/skills` before running `claude-base.yaml` on the laptop for
+the first time. It was on the pre-split layout: `~/workspace/skills/local` was a
+symlink into `agent-tools/skills` from before that repo was split into public and
+private halves, so the role's clone of `agent-tools-private` could never have
+succeeded. Of the 15 skills the role expects, 5 were linked and only 1 matched.
+
+Nothing local needed rescuing: every source repo was clean with no unpushed
+commits. `agent-tools` was 15 commits behind and is now pulled.
+
+Three role fixes, each a defect the reconciliation surfaced:
+
+| Defect | Fix |
+|---|---|
+| Clone fails against the pre-split symlink | Remove it first; a real directory is left alone |
+| `playwright-docker` excluded outright for servers, so workstations lost it | Workstation-only link, gated on the `local` group |
+| `update: no` leaves dangling links silently when a skill is added upstream | Report dangling links rather than fixing them silently |
+
+Also resolved a genuine conflict between two roles over the same path. The `files`
+role per-file-symlinks everything under `files/home`, producing a real directory
+full of symlinks exactly where `claude_skills` wants a whole-directory symlink;
+its no-clobber guard then aborted the play before the hook registration ran.
+
+The directory link is right for memory specifically: Claude writes **new** memory
+files there, and per-file links leave those as untracked real files, whereas a
+directory link captures them in the repo automatically. That inverts the usual
+reason for per-file linking, which exists to keep app-written sidecar files *out*
+of git. `link_tree` gained a `link_tree_excludes` list and the `files` role now
+skips `.claude/projects`.
+
+With the play completing, the shai-hulud PreToolUse hook is registered and
+`teammateMode: auto` is enforced. Both were unset before, so the agent-config
+protection CLAUDE.md documents is now actually in force.
+
+`~/.claude/skills` holds 18 skills, all resolving. Both playbooks report
+`changed=0` on a second run.
+
+The CLAUDE.md em dash rule was also rescoped: it applies to content authored on
+Jack's behalf (articles, resumes, emails, posts), not to conversation.
+
 ## 2026-08-19 - voxtype rendered per machine
 
 Triaged both voxtype configs against the packaged default at

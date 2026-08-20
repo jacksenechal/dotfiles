@@ -17,8 +17,7 @@ claude_skills_repos:
   - repo: https://github.com/vercel-labs/skills
     dest: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills"
 
-# Each entry maps ~/.claude/skills/<name> -> <src>.
-# playwright-docker is deliberately excluded: it must not be symlinked on servers.
+# Each entry maps ~/.claude/skills/<name> -> <src>. Linked on every host.
 claude_skills_skill_links:
   - name: add-homebox-app
     src: "{{ claude_skills_home }}/workspace/skills/local/add-homebox-app"
@@ -50,6 +49,14 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/skill-security-auditor"
   - name: sync-claude-config
     src: "{{ claude_skills_home }}/workspace/skills/local/sync-claude-config"
+
+# Linked on workstations only (inventory group `local`). playwright-docker drives
+# a dockerised browser through noVNC and has no business on a server; it was
+# previously handled by omitting it entirely, which meant workstations silently
+# lost a skill they use.
+claude_skills_workstation_skill_links:
+  - name: playwright-docker
+    src: "{{ claude_skills_home }}/workspace/agent-tools/skills/playwright-docker"
 
 claude_skills_hook_entry:
   matcher: "*"

@@ -1,5 +1,7 @@
--- Input settings carried from the Omarchy 3.8.5 input.conf (archived 2026-08-18).
--- Only keys that differ from Omarchy 4's defaults are set here.
+-- Personal input overrides, tracked in ~/workspace/dotfiles.
+-- This is Omarchy's own override file: hyprland.lua requires it after the
+-- package defaults, so anything set here wins. Only keys that differ from
+-- Omarchy 4's defaults are set, so the defaults keep improving underneath.
 
 hl.config({
   input = {
@@ -34,7 +36,7 @@ hl.config({
 -- Verify with `hyprctl devices` and read the "mice:" block, not "Keyboards:".
 -- Both names are covered below; a device rule aimed at a keyboard is a no-op.
 local deathadder = {
-  sensitivity = -0.5,
+  sensitivity = -0.75,
   scroll_factor = 1.0,
   natural_scroll = true,
 }

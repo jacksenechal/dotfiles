@@ -2,6 +2,46 @@
 
 Notable changes to this repo. Newest first.
 
+## 2026-08-20 - Hyprland leaves the overlay pattern
+
+Jack noticed that `omarchy menu` -> "input configuration" opens
+`~/.config/hypr/input.lua`, whose own header says personal overrides go there, and
+asked whether the overlay was duplicating a mechanism Omarchy already provides.
+It was.
+
+The overlay pattern earns its keep when the distro's file **carries settings it
+will keep updating**, because owning such a file freezes you on a stale baseline.
+That is true of `tmux.conf` and `kitty.conf`. It is not true of Hyprland:
+
+| File | Migrations ever touching it | Real settings in the template |
+|---|---|---|
+| `input.lua` | 1, checksum-guarded, uses `cp` | 0 |
+| `bindings.lua` | 1, checksum-guarded, uses `cp` | 0 |
+| `looknfeel.lua` | none | 0 |
+| `monitors.lua` | none | 4 |
+| `autostart.lua` | none | 0 |
+
+Those files are all-comment templates. The actual defaults live in
+`$OMARCHY_PATH/default/hypr/` and load first regardless, so owning the override
+files cannot cause drift and an overlay buys nothing. It did cost something: the
+menu entry opened a base file showing none of Jack's settings.
+
+So `hypr/jack.lua` and `hypr/jack/` are gone, and
+`files/desktop/.config/hypr/{input,bindings,looknfeel}.lua` are symlinked directly
+like any other tracked file. `hyprland.lua` returns to byte-identical stock, which
+also removes the only `mv`-rewritten file from our exposure, and the
+`require("hypr.jack")` include line is retired. Two overlay entries remain
+(tmux, kitty) rather than three, and Hyprland drops from two layers to one.
+
+The `cp`-versus-`mv` distinction matters and was missed the first time: `cp src dest`
+writes *through* a symlink, preserving the inode, while `mv` replaces it. The one
+migration that touches these files uses `cp` and skips modified files anyway.
+
+Settings verified unchanged after the move: `compose:ralt`, `repeat_delay 600`,
+touchpad `scroll_factor 0.2`, `border_size 0`, `rounding 8`,
+`focus_on_activate false`, all three restored keybindings, and the DeathAdder rule
+still bound.
+
 ## 2026-08-19 - Claude skills reconciled; two roles stopped fighting
 
 Reconciled `~/.claude/skills` before running `claude-base.yaml` on the laptop for

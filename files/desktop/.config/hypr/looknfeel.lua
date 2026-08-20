@@ -1,4 +1,5 @@
--- Appearance carried from the Omarchy 3.8.5 looknfeel.conf (archived 2026-08-18).
+-- Personal appearance overrides, tracked in ~/workspace/dotfiles. This is
+-- Omarchy's own override file, loaded after the package defaults.
 
 hl.config({
   general = {

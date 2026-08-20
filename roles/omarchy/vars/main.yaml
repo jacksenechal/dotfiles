@@ -15,15 +15,16 @@ omarchy_overlay_includes:
     comment: "#"
     line: include ./local.conf
 
-  - name: hyprland
-    path: .config/hypr/hyprland.lua
-    comment: "--"
-    line: require("hypr.jack")
 
 omarchy_overlay_symlink_checks:
   - .config/tmux/local.conf
   - .config/kitty/local.conf
-  - .config/hypr/jack.lua
-  - .config/hypr/jack/bindings.lua
-  - .config/hypr/jack/input.lua
-  - .config/hypr/jack/looknfeel.lua
+  # Omarchy's own hypr override files, symlinked outright rather than overlaid.
+  # They carry no settings of their own - the defaults live in
+  # $OMARCHY_PATH/default/hypr and load first - so owning them causes no drift and
+  # needs no include line. Only one migration has ever touched input.lua or
+  # bindings.lua; it is checksum-guarded and uses `cp`, which writes through a
+  # symlink rather than replacing it.
+  - .config/hypr/input.lua
+  - .config/hypr/bindings.lua
+  - .config/hypr/looknfeel.lua

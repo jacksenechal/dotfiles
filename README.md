@@ -34,7 +34,13 @@ Four do today:
 | everywhere | `~/.bashrc` | `~/.bashrc_jack` | `group_vars/all.yaml` |
 | Omarchy | `~/.config/tmux/tmux.conf` | `~/.config/tmux/local.conf` | `roles/omarchy` |
 | Omarchy | `~/.config/kitty/kitty.conf` | `~/.config/kitty/local.conf` | `roles/omarchy` |
-| Omarchy | `~/.config/hypr/*.lua` | `~/.config/hypr/jack.lua` | `roles/omarchy` |
+
+Hyprland is deliberately **not** in that table. Omarchy's `hypr/input.lua`,
+`bindings.lua` and `looknfeel.lua` are all-comment templates carrying no settings
+of their own, so they are symlinked directly like any other tracked file. An
+overlay there would buy nothing and would break `omarchy menu`'s "input
+configuration" entry, which opens the base file. See
+`roles/overlays/README.md` for the deciding test.
 
 Bash is the oldest of these and predates the pattern having a name: `~/.bashrc`
 is seeded from `/etc/skel` and carries distro-specific setup, so the repo tracks

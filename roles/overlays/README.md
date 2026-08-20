@@ -37,6 +37,32 @@ that is what `vars/<profile>.yaml` describes.
 | kitty | `include` | `~/.config/kitty/local.conf` |
 | Hyprland | `require()` | `~/.config/hypr/jack.lua` -> `hypr/jack/*.lua` |
 
+## When NOT to use an overlay
+
+The pattern costs something: a second layer to reason about, and a base file that
+no longer holds your settings even though the distro's own tooling points at it.
+Pay that only when it buys something.
+
+**The test: does the distro's file carry settings it will keep updating?**
+
+- **Yes → overlay.** `~/.config/tmux/tmux.conf` and `~/.config/kitty/kitty.conf`
+  ship real configuration that Omarchy improves through migrations. Owning them
+  freezes you on the baseline you copied, which is exactly the drift that had to
+  be cleaned up after the Omarchy 4 upgrade.
+- **No → just symlink it.** Omarchy's `hypr/input.lua`, `bindings.lua` and
+  `looknfeel.lua` contain **zero** settings; they are all-comment templates, and
+  the real defaults live in `$OMARCHY_PATH/default/hypr/` and load first
+  regardless. Owning them cannot cause drift, so an overlay buys nothing and
+  costs the `omarchy menu` entry for "input configuration", which opens the base
+  file and would show none of your settings.
+
+Migration exposure confirms it rather than driving it. `looknfeel.lua`,
+`monitors.lua` and `autostart.lua` have never been touched by a migration;
+`input.lua` and `bindings.lua` by exactly one, which is checksum-guarded (it skips
+modified files) and uses `cp`, which writes *through* a symlink instead of
+replacing it. Only `hyprland.lua` is `mv`-rewritten, and it stays Omarchy's,
+fully stock, because it already requires the override files by name.
+
 ## Residual risk, and the guard
 
 The include line itself is the only thing exposed - one line per app. If a

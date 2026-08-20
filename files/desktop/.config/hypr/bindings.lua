@@ -1,4 +1,5 @@
--- Keybindings carried from the Omarchy 3.8.5 bindings.conf (archived 2026-08-18).
+-- Personal keybindings, tracked in ~/workspace/dotfiles. This is Omarchy's own
+-- override file, loaded after the package defaults.
 -- Everything else in that file is now an Omarchy 4 default, including the F9
 -- push-to-talk dictation pair (see default/hypr/bindings/voxtype.lua).
 

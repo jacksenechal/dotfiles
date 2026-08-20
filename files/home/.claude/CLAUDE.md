@@ -54,3 +54,47 @@ Rules:
 - When beginning a task, always think about it and ask for any clarifications you need to be successful
 - Context coherence is vital. Code coherence is vital. When appropriate, run a subagent to examine the whole scene (probably with a specific topic in mind), e.g. all documentation, or all possibly relevant code locations, make a survey to ensure the globality of your context, comprehension, or changes. Example: updating task status in a project tracking document, see if there's an epic with a percentage completion that should be kept in sync. Example: a library was updated, and all tests pass, but documentation and untested legacy code pathways were not considered. Example: Dev process changes, but README didn't get updated.
 - When a task is complete, consider whether there are linters, tests, security scanners, etc that could be run to validate it. Do this work in a subagent.
+
+# Practices
+
+Merged 2026-08-19 from the copy that had grown on the laptop at
+~/.claude/CLAUDE.md while this file grew separately in the repo. The two shared
+no lines. Kept verbatim rather than rewritten; reconcile at leisure, noting that
+the twelve-step workflow below sits in some tension with "Pack, don't emanate"
+above.
+
+Search: Always use perplexity to search -- it saves tokens and provides references.
+
+Research: When brainstorming possible solutions with the user, before proposing to write code, always research to see if someone has built this already. You don't need to ask permission to research. It's always worth it to have an informed perspective.
+
+Documentation: Always look for appropriate documentation steps after finishing a task. You need to make sure that learnings are captured in memory or repo docs, as appropriate, that README type documents have been updated to reflect new capabilites, etc. The goal is to always maintain the integrity of the documentation layer, ensuring it is consistent, relevant, and accurate.
+
+Documentation - clarify jargon: In any document meant for human consumption (especially anything potentially client-facing), spell out dense jargon and acronyms on first use, as is standard best practice for publicly-consumable writing. E.g. the first reference to CI should read "CI (continuous integration) will live in GitHub Workflows"; likewise RBAC (role-based access control), IA (information architecture), E2E (end-to-end), etc. After first definition, the short form is fine.
+
+Testing: Always run tests to ensure that code is working as expected. Make sure you understand the idiomatic / repo apprpriate way to run tests... how does the team do it? If this is not properly documented, then ask the user what the best way to run the tests is, and document it for next time.
+
+Approach to coding: In general, follow the rule of thumb that you need to investigate, spike, prove something out before you really understand it. The walking skeleton model is helpful here. Drive out risks and uncertainties without trying to flesh out the full product. After a spike succeeds, study it, learn what worked and what didn't, think about what you'd do if you started fresh to make it better quality code. Then use that to generate the full plan, throw away the spike code, and write the real thing. Code is always better the second time you write it. Follow this discipline to achieve highest-quality results.
+
+Development workflow:
+- Understand: Make sure you clearly understand the problem. Think about it. This is the step where 90% of the problems happen, so it's worth spending a LOT of time thinking, examininig, clarifying, until you have get a "click" of understanding. This is a good phase to engage the user for confirmation.
+- Plan: Clearly state the approach to solving the problem. It needn't be verbose, but it should capture the complete delivery process at a high level. Don't over-specify. A correct high-level bullet is better than 100 detailed steps that aren't completely aligned with the intent. Capture this plan in a persistent artifact.
+- Decompose: For each step of the plan, decompose the problem into smaller steps. Think about how individual developers or agents could handle tasks in parallel. What orthogonal chunks can be cleanly separated? How will they be brought back together cleanly?
+- Delegate: Use sub-agents to handle discrete tasks in parallel. Use cheaper models when they could accomplish the task. Think about what context and tools are needed by each task. Think about how they will coordinate efforts, if they'll need to talk about things. Think about how the results will be merged together in the end. You have options for work coordination: same worktree, separate worktrees, temporary work dir for abstract problem solving, etc.
+- Supervise: You are ultimately responsible for the output of the sub-agent. Keep an eye on their progress. If they're stuck in a loop, you need to get them out. If they can't handle the problem for some reason, you need to figure out why and give them the tools, permissions, context, or model power to accomplish the job.
+- Evaluate: Is the approach working? Have we surfaced any issues that make us re-consider our plan? Don't just doggedly seek to complete a goal that doesn't make sense given new information. If you need to consult the user and adjust the plan, do so.
+- Enforce: Anything that's worth writing is worth writing correctly. Ensure:
+  - Good architecture
+  - Clean code
+  - Concise, readable, well-structured approach
+  - Automated tests exist, at least for happy path
+  - Documentation, if relevant, has been updated
+  - QA/integration testing has been done, if applicable
+  - Code is committed
+- Review: Examine the generated code and see if it meets your expectations. If not, send it back for revision.
+- Merge: You can delegate this to a sub-agent, but you are responsible to ensure that the final output of a sub-agent is cleanly merged into the main working branch. Tests must be run at this stage, linters, etc. Take time here to make sure it's clean, as integration is a common point of failure.
+- Iterate: Work until the full plan has been completed. If you think you're getting close, revisit the problem statement and the original intent. Given what you know now, are there other angles that need to be addressed or fleshed out? Completeness is a feeling. Look for the click. This is worth dwelling on.
+- Deliver a polished result -- don't stop and say "ok test it and see if it looks right" or something like that unless you've already tested it to your full capacity to ensure it meets your expectations.
+
+Approach to devops: The above can be extrapolated to devops as well. A lot of work happens at this layer, and it tends to be less planning-oriented and more troubleshoot-until-you-finallly-figure-it-out. But it needs a similar delegate-and-supervise agent model so we don't waste precious orchestrator context and tokens, and it needs similar documentation, review, and polish stages.
+
+Github: Use git operations and the gh cli fluently. You can use gh to create PRs, query issues, and many other things.

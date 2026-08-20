@@ -25,13 +25,30 @@ hl.config({
 })
 
 -- Razer DeathAdder: lower sensitivity, and don't inherit the touchpad's
--- scroll_factor. Inert until the mouse is plugged in.
-hl.device({
-  name = "razer-razer-deathadder-essential-white-edition-1",
+-- scroll_factor. `sensitivity` runs -1.0 (slowest) to 1.0 (fastest), 0 = default.
+--
+-- The device exposes several HID endpoints and Hyprland disambiguates them with a
+-- numeric suffix whose assignment is not stable across sessions. As of 2026-08-20
+-- the pointer is the bare name while the "-1" suffix belongs to a *keyboard*
+-- endpoint, so a rule aimed at "-1" was applied to a keyboard and silently ignored.
+-- Verify with `hyprctl devices` and read the "mice:" block, not "Keyboards:".
+-- Both names are covered below; a device rule aimed at a keyboard is a no-op.
+local deathadder = {
   sensitivity = -0.5,
   scroll_factor = 1.0,
   natural_scroll = true,
-})
+}
+
+for _, name in ipairs({
+  "razer-razer-deathadder-essential-white-edition",
+  "razer-razer-deathadder-essential-white-edition-1",
+}) do
+  local rule = { name = name }
+  for key, value in pairs(deathadder) do
+    rule[key] = value
+  end
+  hl.device(rule)
+end
 
 -- Three-finger touchpad gestures. Omarchy 4 ships none by default.
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })

@@ -68,4 +68,5 @@ claude_skills_hook_entry:
 # without owning the file (settings.json stays host-managed for volatile keys
 # like theme/model). Add scalar keys here to standardize them across hosts.
 claude_skills_settings_defaults:
+  outputStyle: sr-opus-5
   teammateMode: auto

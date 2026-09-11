@@ -49,6 +49,8 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/skill-security-auditor"
   - name: sync-claude-config
     src: "{{ claude_skills_home }}/workspace/skills/local/sync-claude-config"
+  - name: technical-conversation-style
+    src: "{{ claude_skills_home }}/workspace/skills/local/technical-conversation-style"
 
 # Linked on workstations only (inventory group `local`). playwright-docker drives
 # a dockerised browser through noVNC and has no business on a server; it was

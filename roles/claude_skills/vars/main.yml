@@ -16,6 +16,8 @@ claude_skills_repos:
     dest: "{{ claude_skills_home }}/workspace/skills/third-party/superpowers"
   - repo: https://github.com/vercel-labs/skills
     dest: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills"
+  - repo: https://github.com/petergyang/no-ai-slop
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/petergyang-no-ai-slop"
 
 # Each entry maps ~/.claude/skills/<name> -> <src>. Linked on every host.
 claude_skills_skill_links:
@@ -33,6 +35,8 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills/skills/find-skills"
   - name: job-search
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/job-search"
+  - name: no-ai-slop
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/petergyang-no-ai-slop/skills/no-ai-slop"
   - name: repo-scout
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/repo-scout"
   - name: scan-to-paperless

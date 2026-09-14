@@ -67,6 +67,8 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/skills/local/sync-claude-config"
   - name: technical-conversation-style
     src: "{{ claude_skills_home }}/workspace/skills/local/technical-conversation-style"
+  - name: triage
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/triage"
   # wayfinder calls grilling, domain-modeling, research, prototype via the Skill tool and expects
   # setup-matt-pocock-skills to have configured a tracker; link the set together.
   - name: wayfinder

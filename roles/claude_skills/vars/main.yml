@@ -18,6 +18,8 @@ claude_skills_repos:
     dest: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills"
   - repo: https://github.com/petergyang/no-ai-slop
     dest: "{{ claude_skills_home }}/workspace/skills/third-party/petergyang-no-ai-slop"
+  - repo: https://github.com/mattpocock/skills
+    dest: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills"
 
 # Each entry maps ~/.claude/skills/<name> -> <src>. Linked on every host.
 claude_skills_skill_links:
@@ -31,18 +33,28 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/skills/third-party/anthropics-skills/skills/claude-api"
   - name: claude-code-guide
     src: "{{ claude_skills_home }}/workspace/skills/local/claude-code-guide"
+  - name: domain-modeling
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/domain-modeling"
   - name: find-skills
     src: "{{ claude_skills_home }}/workspace/skills/third-party/vercel-labs-skills/skills/find-skills"
+  - name: grilling
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/productivity/grilling"
   - name: job-search
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/job-search"
   - name: no-ai-slop
     src: "{{ claude_skills_home }}/workspace/skills/third-party/petergyang-no-ai-slop/skills/no-ai-slop"
+  - name: prototype
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/prototype"
   - name: repo-scout
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/repo-scout"
+  - name: research
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/research"
   - name: scan-to-paperless
     src: "{{ claude_skills_home }}/workspace/skills/local/scan-to-paperless"
   - name: semi-formal-code-reasoning
     src: "{{ claude_skills_home }}/workspace/agent-tools/skills/semi-formal-code-reasoning"
+  - name: setup-matt-pocock-skills
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/setup-matt-pocock-skills"
   - name: skill-creator
     src: "{{ claude_skills_home }}/workspace/skills/third-party/anthropics-skills/skills/skill-creator"
   - name: skill-judge
@@ -55,6 +67,10 @@ claude_skills_skill_links:
     src: "{{ claude_skills_home }}/workspace/skills/local/sync-claude-config"
   - name: technical-conversation-style
     src: "{{ claude_skills_home }}/workspace/skills/local/technical-conversation-style"
+  # wayfinder calls grilling, domain-modeling, research, prototype via the Skill tool and expects
+  # setup-matt-pocock-skills to have configured a tracker; link the set together.
+  - name: wayfinder
+    src: "{{ claude_skills_home }}/workspace/skills/third-party/mattpocock-skills/skills/engineering/wayfinder"
 
 # Linked on workstations only (inventory group `local`). playwright-docker drives
 # a dockerised browser through noVNC and has no business on a server; it was

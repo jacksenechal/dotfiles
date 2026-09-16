@@ -2,6 +2,35 @@
 
 Notable changes to this repo. Newest first.
 
+## 2026-09-16 - Generic FUSE sleep guard, replacing locomotive's incus-fuse-guard
+
+Locomotive (issue #18) had a host `system-sleep(8)` hook, `incus-fuse-guard`,
+that unwedges a suspend blocked on lxcfs's FUSE (Filesystem in Userspace)
+connection: a container's `udisksd` can stall mid-request in uninterruptible
+sleep (D state) inside `fuse_file_poll -> __fuse_simple_request ->
+request_wait_answer`, and a D-state task can't be frozen, so every suspend
+attempt fails and logind retries forever. That hook lived in an app repo
+instead of the dotfiles that provision every host, and it only ever looked
+for lxcfs.
+
+`roles/services/tasks/main.yaml` now installs `fuse-sleep-guard` to
+`/usr/lib/systemd/system-sleep/` instead - generic (any wedged FUSE mount,
+not just lxcfs), distro-independent, and root-installed the same way the
+`cpu-epp-performance.service` unit already is. It samples `ps` D-state/wchan
+twice, 2s apart, to keep only persistently-stuck tasks, resolves the FUSE
+connection each one is blocked on from its own `/proc/<pid>/mountinfo` and
+open fds (falling back to any FUSE connection with `waiting > 0` when a pid's
+fds can't be read), and aborts just that connection via
+`/sys/fs/fuse/connections/<id>/abort`. `services` was chosen over `linux`
+because `linux` isn't in `dotfiles-base.yaml`'s role list at all (it only
+runs from the separate `ubuntu-base.yaml`/`debian-base.yaml` bootstrap
+playbooks), while `services` already owns this exact pattern - a root-owned
+file under `files/system/`, installed with `become: true` - for
+`cpu-epp-performance.service`.
+
+`incus-fuse-guard` is removed from that repo; its `host/README.md` now
+points here.
+
 ## 2026-08-20 - Hyprland leaves the overlay pattern
 
 Jack noticed that `omarchy menu` -> "input configuration" opens

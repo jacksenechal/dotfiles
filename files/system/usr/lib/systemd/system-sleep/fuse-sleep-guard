@@ -1,0 +1,266 @@
+#!/usr/bin/env bash
+# fuse-sleep-guard -- a systemd-sleep(8) hook that unwedges a host suspend
+# blocked on a stuck FUSE (Filesystem in Userspace) connection.
+#
+# Generalized from locomotive's incus-fuse-guard (locomotive issue #18): a
+# container's udisksd had an lxcfs-served /proc file open via a FUSE fd and
+# was stopped mid-request, wedging it in uninterruptible sleep (D state)
+# inside fuse_file_poll -> __fuse_simple_request -> request_wait_answer. A
+# D-state task can't be frozen, so every suspend attempt failed and logind
+# just retried forever. That incident was lxcfs-specific; this hook is
+# generic -- it finds *any* task wedged the same way against *any* FUSE
+# mount (gvfsd-fuse, portal, sshfs, lxcfs, ...) and aborts just that
+# connection, never anything else.
+#
+# systemd-sleep contract: called as
+#   <script> pre|post  suspend|hibernate|hybrid-sleep|suspend-then-hibernate
+# Every executable under /usr/lib/systemd/system-sleep/ runs automatically
+# around suspend/hibernate -- see system-sleep(8). No enable/reload step
+# needed; this file only needs to be present and executable.
+#
+# DRY_RUN=1 (env var): skip the actual `echo 1 > .../abort` write; log what
+# would happen instead. Lets the detection/resolution logic be exercised
+# without root and without touching a live FUSE connection.
+set -o pipefail
+
+ACTION="${1:-}"
+EVENT="${2:-}"
+DRY_RUN="${DRY_RUN:-0}"
+ABORTED_FILE="/run/fuse-sleep-guard.aborted"
+
+log() { logger -t fuse-sleep-guard -- "$*" 2>/dev/null || true; }
+say() { echo "fuse-sleep-guard: $*"; }
+
+# Tasks in uninterruptible sleep (D) blocked inside a FUSE request wait.
+# wchan is truncated to ~15 chars by default in some ps builds; widen it.
+find_stuck() {
+  ps -eo pid,stat,wchan:32,comm --no-headers 2>/dev/null \
+    | awk '$2 ~ /D/ && $3 ~ /fuse_|request_wait_answer/'
+}
+
+# Look up a FUSE connection's fstype + mountpoint for logging, via the
+# host's live mount table. Prints "fstype mountpoint", or nothing if the
+# connection has no matching live mount any more.
+conn_info() {
+  local id="$1"
+  findmnt -rn -o MAJ:MIN,FSTYPE,TARGET 2>/dev/null \
+    | awk -v id="$id" '$2 ~ /^fuse(\.|$)/ { split($1, a, ":"); if (a[2] == id) { print $2, $3; exit } }'
+}
+
+# Resolve the FUSE connection(s) a pid is blocked on, by reading that pid's
+# *own* /proc/<pid>/mountinfo (correct even for a process in a container's
+# mount namespace -- its own mountinfo and its own /proc/<pid>/fd/* symlink
+# targets are expressed in the same namespace, so a plain path-prefix match
+# between the two is namespace-safe without any device-number arithmetic).
+#
+# Prints one connection id per line, or the literal token "FALLBACK" if the
+# pid's fds/mountinfo can't be read at all (kernel thread, permission), or
+# "NONE" if they could be read but no FUSE mount matched any open fd.
+resolve_pid_conns() {
+  local pid="$1"
+  local mountinfo="/proc/$pid/mountinfo"
+  local fddir="/proc/$pid/fd"
+  local mountinfo_content fd_entries fuse_mounts conns=""
+
+  if ! mountinfo_content="$(cat "$mountinfo" 2>/dev/null)"; then
+    echo "FALLBACK"; return
+  fi
+  if ! fd_entries="$(find "$fddir" -mindepth 1 -maxdepth 1 2>/dev/null)"; then
+    echo "FALLBACK"; return
+  fi
+
+  # "connid mountpoint" for every FUSE mount visible to this pid. connid is
+  # just the minor of mountinfo's own maj:min field -- FUSE's anon-dev
+  # allocator hands out one minor per connection, shared major, and that
+  # minor is exactly the /sys/fs/fuse/connections/<N> directory name.
+  fuse_mounts="$(awk '{
+    sep = 0
+    for (i = 1; i <= NF; i++) { if ($i == "-") { sep = i; break } }
+    if (sep == 0) next
+    fstype = $(sep + 1)
+    if (fstype ~ /^fuse(\.|$)/) { split($3, dev, ":"); print dev[2], $5 }
+  }' <<<"$mountinfo_content")"
+
+  if [ -z "$fuse_mounts" ]; then
+    echo "NONE"; return
+  fi
+
+  local fd target connid mnt
+  for fd in $fd_entries; do
+    target="$(readlink "$fd" 2>/dev/null)" || continue
+    [ -n "$target" ] || continue
+    case "$target" in
+      socket:*|pipe:*|anon_inode:*) continue ;;
+    esac
+    while IFS=' ' read -r connid mnt; do
+      [ -n "$connid" ] || continue
+      case "$target" in
+        "$mnt"|"$mnt"/*) conns="$conns$connid"$'\n' ;;
+      esac
+    done <<<"$fuse_mounts"
+  done
+
+  if [ -z "$conns" ]; then
+    echo "NONE"
+  else
+    sort -u <<<"$conns" | awk 'NF'
+  fi
+}
+
+# Fallback when a stuck pid's fds can't be inspected: the union of every
+# fuse.* mount on the host whose connection currently shows waiting > 0.
+# Not pid-specific -- best effort, since we can't tell which mount the
+# kernel thread / permission-denied pid was actually blocked on.
+fallback_conns() {
+  local majmin id waiting
+  findmnt -rn -o MAJ:MIN,FSTYPE,TARGET 2>/dev/null | awk '$2 ~ /^fuse(\.|$)/ { print $1 }' \
+    | while IFS=: read -r _ id; do
+        [ -n "$id" ] || continue
+        if waiting="$(cat "/sys/fs/fuse/connections/$id/waiting" 2>/dev/null)"; then
+          [ "${waiting:-0}" -gt 0 ] 2>/dev/null && echo "$id"
+        else
+          log "fallback: cannot read /sys/fs/fuse/connections/$id/waiting (permission denied?); skipping"
+        fi
+      done
+}
+
+log_lines() {
+  local block="$1" line
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    log "  $line"
+    say "  $line"
+  done <<<"$block"
+}
+
+run_pre() {
+  local first second first_pids persistent="" line pid stat wchan comm
+
+  first="$(find_stuck)"
+  if [ -z "$first" ]; then
+    return
+  fi
+  log "D-state task(s) blocked in a FUSE wait, suspend at risk (first sample):"
+  say "found D-state FUSE-wait task(s), confirming they're persistent:"
+  log_lines "$first"
+
+  sleep 2
+  second="$(find_stuck)"
+  first_pids="$(awk '{print $1}' <<<"$first")"
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    pid="$(awk '{print $1}' <<<"$line")"
+    grep -qx "$pid" <<<"$first_pids" && persistent="$persistent$line"$'\n'
+  done <<<"$second"
+
+  if [ -z "$persistent" ]; then
+    log "D-state task(s) were transient (gone 2s later); leaving suspend alone"
+    say "was transient, not touching anything"
+    return
+  fi
+
+  log "persistent across two samples 2s apart, resolving FUSE connection(s):"
+  log_lines "$persistent"
+
+  local all_conns="" resolved
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    pid="$(awk '{print $1}' <<<"$line")"
+    wchan="$(awk '{print $3}' <<<"$line")"
+    comm="$(awk '{print $4}' <<<"$line")"
+    resolved="$(resolve_pid_conns "$pid")"
+    case "$resolved" in
+      FALLBACK)
+        log "pid $pid ($comm, wchan=$wchan): fds/mountinfo unreadable, falling back to all waiting FUSE connections"
+        resolved="$(fallback_conns)"
+        ;;
+      NONE)
+        log "pid $pid ($comm, wchan=$wchan): no FUSE mount matched any open fd"
+        resolved=""
+        ;;
+      *)
+        log "pid $pid ($comm, wchan=$wchan): resolved to connection(s): $(tr '\n' ' ' <<<"$resolved")"
+        ;;
+    esac
+    [ -n "$resolved" ] && all_conns="$all_conns$resolved"$'\n'
+  done <<<"$persistent"
+
+  all_conns="$(sort -u <<<"$all_conns" | awk 'NF')"
+  if [ -z "$all_conns" ]; then
+    log "no FUSE connection could be resolved for any stuck task; nothing to abort"
+    say "could not resolve a connection to abort"
+    return
+  fi
+
+  local id info fstype mnt conn_dir aborted=""
+  while IFS= read -r id; do
+    [ -n "$id" ] || continue
+    conn_dir="/sys/fs/fuse/connections/$id"
+    info="$(conn_info "$id")"
+    if [ -n "$info" ]; then
+      fstype="${info%% *}"
+      mnt="${info#* }"
+    else
+      fstype="unknown"; mnt="unknown"
+    fi
+
+    if [ "$DRY_RUN" = "1" ]; then
+      log "DRY_RUN: would abort FUSE connection $id (fstype=$fstype, mountpoint=$mnt)"
+      say "DRY_RUN: would abort FUSE connection $id (fstype=$fstype, mountpoint=$mnt)"
+      continue
+    fi
+
+    if [ ! -e "$conn_dir/abort" ]; then
+      log "connection $id (fstype=$fstype, mountpoint=$mnt): no $conn_dir/abort, already gone"
+      continue
+    fi
+    log "aborting FUSE connection $id (fstype=$fstype, mountpoint=$mnt)"
+    if echo 1 > "$conn_dir/abort" 2>/dev/null; then
+      aborted="$aborted$id $fstype $mnt"$'\n'
+    else
+      log "failed to write $conn_dir/abort (not root?)"
+    fi
+  done <<<"$all_conns"
+
+  if [ -n "$aborted" ] && [ "$DRY_RUN" != "1" ]; then
+    printf '%s' "$aborted" > "$ABORTED_FILE" 2>/dev/null || log "could not write $ABORTED_FILE"
+  fi
+
+  sleep 1
+  local still_stuck
+  still_stuck="$(find_stuck)"
+  if [ -z "$still_stuck" ]; then
+    log "outcome: no more D-state FUSE-wait tasks; suspend should proceed"
+    say "outcome: clear"
+  else
+    log "outcome: still stuck after abort attempt(s):"
+    say "outcome: still stuck:"
+    log_lines "$still_stuck"
+  fi
+}
+
+run_post() {
+  [ -e "$ABORTED_FILE" ] || return
+  if grep -q 'lxcfs' "$ABORTED_FILE" 2>/dev/null; then
+    log "reminder: lxcfs's FUSE connection was aborted before suspend; run 'systemctl restart lxcfs' before starting any Incus instance"
+    say "reminder: lxcfs was aborted before suspend, restart it before using Incus"
+  fi
+  log "connection(s) aborted before this suspend:"
+  log_lines "$(cat "$ABORTED_FILE" 2>/dev/null)"
+  rm -f "$ABORTED_FILE" 2>/dev/null || true
+}
+
+case "$ACTION" in
+  pre)
+    case "$EVENT" in
+      suspend*|hibernate*) run_pre ;;
+    esac
+    ;;
+  post)
+    case "$EVENT" in
+      suspend*|hibernate*) run_post ;;
+    esac
+    ;;
+esac
+
+exit 0

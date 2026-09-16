@@ -44,3 +44,24 @@
     name: "{{ ansible_facts['user_id'] }}"
     append: yes
     groups: docker
+
+# Generic systemd-sleep(8) hook: aborts any FUSE (Filesystem in Userspace)
+# connection a task is wedged against in uninterruptible sleep (D state),
+# so a stuck FUSE request can never block host suspend indefinitely. See
+# files/system/usr/lib/systemd/system-sleep/fuse-sleep-guard for the
+# detection/resolution logic. Replaces locomotive's incus-fuse-guard, which
+# was lxcfs/Incus-specific and lived in that repo instead of here.
+- name: Install fuse-sleep-guard system-sleep hook
+  become: yes
+  ansible.builtin.copy:
+    src: system/usr/lib/systemd/system-sleep/fuse-sleep-guard
+    dest: /usr/lib/systemd/system-sleep/fuse-sleep-guard
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Remove superseded incus-fuse-guard hook
+  become: yes
+  ansible.builtin.file:
+    path: /usr/lib/systemd/system-sleep/incus-fuse-guard
+    state: absent

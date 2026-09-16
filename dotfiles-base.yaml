@@ -32,6 +32,9 @@
       tags: python
     - role: services
       tags: services
+    # Laptop hibernation (Omarchy-only, per-host via power_machines).
+    - role: power
+      tags: power
     - role: symlinks
       tags: symlinks
     - role: local_utilities

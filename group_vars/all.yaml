@@ -36,3 +36,15 @@ voxtype_machines:
     hotkey_key: RIGHTALT
     # PipeWire echo-cancel sink, configured by the drop-in in files/desktop.
     audio_device: echocancel
+
+# Per-machine power settings, merged over roles/power/defaults. Same hostname
+# keying as voxtype_machines. Read by roles/power (hibernation) and by
+# roles/services (whether to install cpu-epp-performance).
+power_machines:
+  omarchy7320:  # laptop
+    hibernation: true
+    hibernate_delay: 3h
+    hibernate_on_ac: false
+    # power-profiles-daemon owns EPP on the laptop; pinning it to performance
+    # on every boot and resume would undo the battery profile.
+    epp_performance: false

@@ -1,0 +1,8 @@
+# Managed by dotfiles roles/power. Edit power_machines in group_vars/all.yaml.
+#
+# suspend-then-hibernate: sleep in s2idle, then write RAM to /swap/swapfile and
+# power off after HibernateDelaySec on battery, or earlier if systemd's battery
+# estimate says the pack would run flat first (see systemd-sleep.conf(5)).
+[Sleep]
+HibernateDelaySec={{ power.hibernate_delay }}
+HibernateOnACPower={{ 'yes' if power.hibernate_on_ac else 'no' }}

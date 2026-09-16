@@ -8,11 +8,36 @@
     state: restarted
 
 # CPU stays at the firmware's balance_performance EPP otherwise. Only meaningful
-# on amd-pstate-epp / intel_pstate HWP hosts, hence the stat guard.
+# on amd-pstate-epp / intel_pstate HWP hosts, hence the stat guard. Machines
+# with epp_performance: false in power_machines (laptops, where
+# power-profiles-daemon owns EPP) get the unit removed instead.
 - name: Check for EPP support
   ansible.builtin.stat:
     path: /sys/devices/system/cpu/cpu0/cpufreq/energy_performance_preference
   register: epp_sysfs
+
+- name: Decide whether this machine pins EPP to performance
+  ansible.builtin.set_fact:
+    epp_performance_wanted: >-
+      {{ epp_sysfs.stat.exists and
+         ((power_machines[ansible_facts['hostname']] | default({})).epp_performance
+          | default(true)) }}
+
+- name: Remove cpu-epp-performance where power-profiles-daemon owns EPP
+  become: yes
+  ansible.builtin.systemd:
+    name: cpu-epp-performance.service
+    enabled: no
+    state: stopped
+  when: not epp_performance_wanted
+  failed_when: false
+
+- name: Remove cpu-epp-performance unit file where not wanted
+  become: yes
+  ansible.builtin.file:
+    path: /etc/systemd/system/cpu-epp-performance.service
+    state: absent
+  when: not epp_performance_wanted
 
 - name: Install cpu-epp-performance unit
   become: yes
@@ -22,7 +47,7 @@
     owner: root
     group: root
     mode: '0644'
-  when: epp_sysfs.stat.exists
+  when: epp_performance_wanted
 
 - name: Enable cpu-epp-performance
   become: yes
@@ -31,7 +56,7 @@
     enabled: yes
     daemon_reload: yes
     state: started
-  when: epp_sysfs.stat.exists
+  when: epp_performance_wanted
 
 - name: Enable the docker service
   systemd:

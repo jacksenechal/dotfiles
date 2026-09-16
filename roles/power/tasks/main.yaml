@@ -1,45 +1,21 @@
 ---
-- name: Resolve power settings for this machine
-  ansible.builtin.set_fact:
-    power: >-
-      {{ power_defaults
-         | combine(power_machines[ansible_facts['hostname']] | default({})) }}
-
-- name: Skip unless hibernation is enabled for this machine
-  ansible.builtin.meta: end_role
-  when: not power.hibernation
-
-- name: Detect Omarchy
-  ansible.builtin.stat:
-    path: /usr/bin/omarchy-hibernation-setup
-  register: omarchy_hibernation_setup
-
-- name: Hibernation is Omarchy-only here
-  ansible.builtin.assert:
-    that: omarchy_hibernation_setup.stat.exists
-    fail_msg: >-
-      power.hibernation is set for {{ ansible_facts['hostname'] }} but
-      omarchy-hibernation-setup is not installed. This role relies on it for
-      the swapfile, resume hook, and Limine cmdline.
-
-# Idempotent by Omarchy's own check (omarchy_resume.conf present => exit 0),
-# and by `creates` so ansible reports it unchanged. --force skips the gum
-# prompts and the reboot offer. The script calls sudo internally, which is a
-# no-op under become. OMARCHY_PATH is needed for the keyboard-backlight hook
-# copy and is normally only exported in an interactive shell.
-- name: Run omarchy hibernation setup
-  become: yes
-  ansible.builtin.command:
-    argv: [omarchy-hibernation-setup, --force]
-    creates: /etc/limine-entry-tool.d/resume.conf
-  environment:
-    OMARCHY_PATH: /usr/share/omarchy
-  register: hibernation_setup
-
-- name: Confirm Omarchy considers hibernation available
+# Hibernation itself (swapfile, initramfs resume hook, Limine resume= and
+# rtc_cmos.use_acpi_alarm=1 cmdline) is a one-time interactive step, like
+# fingerprint setup: run `omarchy hibernation setup` by hand and reboot. This
+# role only follows it with the two systemd drop-ins that make the lid use
+# suspend-then-hibernate. Both are inert until that setup exists, and
+# `omarchy hibernation available` is Omarchy's public check for it.
+- name: Check whether Omarchy hibernation is set up
   ansible.builtin.command:
     argv: [omarchy-hibernation-available]
+  register: hibernation
+  check_mode: false  # read-only probe; keep it live so --check gates correctly
   changed_when: false
+  failed_when: false
+
+- name: Skip unless hibernation is available
+  ansible.builtin.meta: end_role
+  when: hibernation.rc != 0
 
 - name: Install suspend-then-hibernate timing
   become: yes
@@ -59,10 +35,3 @@
     group: root
     mode: '0644'
   notify: restart systemd-logind
-
-- name: Reboot needed for the resume hook and cmdline to take effect
-  ansible.builtin.debug:
-    msg: >-
-      omarchy hibernation setup rebuilt the initramfs and boot entries.
-      Reboot, then verify with: grep -o 'resume[^ ]*' /proc/cmdline
-  when: hibernation_setup is changed

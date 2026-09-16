@@ -1,20 +1,8 @@
 ---
-# Baseline: no hibernation. Per-machine overrides live in group_vars/all.yaml
-# under power_machines, keyed on the real hostname (see files/hosts/README.md
-# for why the inventory name cannot tell workstations apart).
-power_defaults:
-  # Run `omarchy hibernation setup` and switch the lid to suspend-then-hibernate.
-  # Omarchy-only: the setup command owns the swapfile, resume hook, and Limine
-  # cmdline drop-ins, so this role never writes those itself.
-  hibernation: false
-  # How long to stay in s2idle on battery before writing RAM to disk and
-  # powering off. systemd also hibernates earlier if its battery estimate says
-  # the pack would run flat first.
-  hibernate_delay: 3h
-  # On AC, stay suspended indefinitely instead of hibernating (no LUKS prompt
-  # when waking at the desk). systemd's default is yes.
-  hibernate_on_ac: false
-  # Whether roles/services installs cpu-epp-performance, which pins the CPU
-  # energy_performance_preference to "performance" on boot and resume. Off on
-  # laptops, where power-profiles-daemon owns EPP per profile.
-  epp_performance: true
+# How long suspend-then-hibernate stays in s2idle on battery before writing RAM
+# to disk and powering off. systemd hibernates earlier if its battery estimate
+# says the pack would run flat first (systemd-sleep.conf(5)).
+power_hibernate_delay: 3h
+# On AC, stay suspended instead of hibernating: no LUKS prompt when waking at
+# the desk. The countdown starts when the cord is pulled.
+power_hibernate_on_ac: false

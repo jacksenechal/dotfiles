@@ -144,17 +144,21 @@ tmux kill-server; tmux new -d \; show-options -g | grep history-limit   # expect
 
 ## Laptop power and hibernation
 
-`roles/power` turns on suspend-then-hibernate for machines listed under
-`power_machines` in `group_vars/all.yaml` (hostname-keyed, like `voxtype_machines`).
-It runs `omarchy hibernation setup --force`, which owns the swapfile, the
+Hibernation is a one-time interactive setup, like fingerprint enrolment: run
+`omarchy hibernation setup` by hand and reboot. It owns the swapfile, the
 initramfs resume hook, and the Limine `resume=` / `rtc_cmos.use_acpi_alarm=1`
-cmdline drop-ins, then adds `sleep.conf.d` timing and a `logind.conf.d` lid
-override. Omarchy-only. The first run rebuilds the initramfs and needs a reboot.
+cmdline drop-ins. `roles/power` then adds two systemd drop-ins so a closed lid
+means s2idle for `power_hibernate_delay` (3h) on battery and then hibernate,
+and stays suspended on AC. The role is a no-op until `omarchy hibernation
+available` succeeds, so it is safe on every host.
 
-The same map carries `epp_performance`, which `roles/services` reads to decide
-whether to install `cpu-epp-performance`. Keep it `false` on laptops:
-power-profiles-daemon sets EPP per profile there, and the unit would pin it to
-performance on every boot and resume.
+This caps ordinary s2idle drain over a weekend. It does not rescue a suspend
+blocked by a task in D state, since hibernate freezes tasks the same way;
+`fuse-sleep-guard` (services role) is what handles that.
+
+`roles/services` installs `cpu-epp-performance` only where
+power-profiles-daemon is not enabled, and removes it where it is: ppd owns EPP
+per profile there and the unit would fight it.
 
 ## Bitwarden Secrets Manager sync
 

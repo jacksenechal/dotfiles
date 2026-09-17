@@ -43,4 +43,12 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart systemd-logind
+  register: lid_conf
+
+# logind only reads logind.conf.d at start, and restarting it takes the
+# graphical session down with it (SDDM loses its session tracking and
+# respawns a greeter on the live VT). The setting is for the next boot.
+- name: Lid handling applies after reboot
+  ansible.builtin.debug:
+    msg: Lid override installed. Reboot to apply.
+  when: lid_conf is changed

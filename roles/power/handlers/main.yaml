@@ -1,8 +1,0 @@
----
-# logind re-reads logind.conf.d only on restart. Sessions survive a restart on
-# current systemd. sleep.conf.d needs nothing: systemd-sleep reads it per run.
-- name: restart systemd-logind
-  become: yes
-  ansible.builtin.systemd:
-    name: systemd-logind.service
-    state: restarted

@@ -54,5 +54,8 @@ end
 
 -- Three-finger touchpad gestures. Omarchy 4 ships none by default.
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
-hl.gesture({ fingers = 3, direction = "up", action = "fullscreen", mode = "maximize" })
+-- Same dispatcher as SUPER + ALT + F ("Full width"). The native gesture
+-- action ("fullscreen", mode "maximize") hides the bar without reclaiming
+-- its space, so route through the dispatcher instead.
+hl.gesture({ fingers = 3, direction = "up", action = function() hl.dispatch(hl.dsp.window.fullscreen({ mode = "maximized" })) end })
 hl.gesture({ fingers = 3, direction = "swipe", mods = "SUPER", action = "resize" })

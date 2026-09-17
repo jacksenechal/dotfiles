@@ -17,6 +17,15 @@
   ansible.builtin.meta: end_role
   when: hibernation.rc != 0
 
+- name: Ensure the sleep.conf.d directory exists
+  become: yes
+  ansible.builtin.file:
+    path: /etc/systemd/sleep.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Install suspend-then-hibernate timing
   become: yes
   ansible.builtin.template:
